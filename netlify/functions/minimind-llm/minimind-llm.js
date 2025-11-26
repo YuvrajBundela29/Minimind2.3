@@ -87,7 +87,7 @@ const languageInstructions = {
   sa_casual: 'Please respond in Sanskrit language but write using English alphabets/Roman script. For example: "Aham kushalah asmi" instead of "अहम् कुशलः अस्मि". This is for users who understand Sanskrit but prefer Roman script.',
   sd_casual: 'Please respond in Sindhi language but write using English alphabets/Roman script. This is for users who understand Sindhi but prefer Roman script.',
   ks_casual: 'Please respond in Kashmiri language but write using English alphabets/Roman script. This is for users who understand Kashmiri but prefer Roman script.',
-  doi_casual: 'Please respond in Dogri language but write using English alphabets/Roman script. This is for users who understand Dogri but prefer Roman script.',
+  doi_casual: 'Please respond in Dogri language but write using English alphabets/Roman script. This is for users who understand Dogri who prefer Roman script.',
   mni_casual: 'Please respond in Manipuri language but write using English alphabets/Roman script. This is for users who understand Manipuri but prefer Roman script.',
   sat_casual: 'Please respond in Santali language but write using English alphabets/Roman script. This is for users who understand Santali but prefer Roman script.',
   mai_casual: 'Please respond in Maithili language but write using English alphabets/Roman script. This is for users who understand Maithili but prefer Roman script.',
