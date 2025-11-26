@@ -1,4 +1,4 @@
-# 🧠 MiniMind 2.1 - AI-Powered Learning Platform
+# 🧠 MiniMind 2.3 - AI-Powered Learning Platform
 
 An innovative educational platform that explains complex concepts in multiple learning styles using advanced AI technology. Experience personalized learning with ultra-realistic voice synthesis, professional UI design, and comprehensive multilingual support.
 
@@ -10,6 +10,13 @@ An innovative educational platform that explains complex concepts in multiple le
   - 🧠 **Thinker**: Analytical and detailed responses
   - 📖 **Story**: Narrative-based learning with examples
   - 🎓 **Mastery**: Advanced, comprehensive explanations
+  
+Each mode now supports rich text *themes* inside answers using markdown-style markers:
+
+- `**bold**` → Gradient bold highlight for key terms
+- `*tilt*` → Tilted/italic emphasis
+- `__highlight__` → Bold with soft pill background for tags/labels
+- `^^large^^` → Slightly larger sub-headings inside answers
 
 ### 🌐 **Multilingual Support**
 - **25+ Languages**: English, Hindi, Urdu, Tamil, Malayalam, Bengali, Punjabi, Gujarati, Kannada, Telugu, Odia, Assamese, Nepali, Marathi, Sanskrit, Sindhi, Kashmiri, Dogri, Manipuri, Santali, Maithili, Konkani, Bhojpuri, Bodo, Rajasthani, and Hinglish
@@ -28,6 +35,17 @@ An innovative educational platform that explains complex concepts in multiple le
 - **Glass Morphism Effects**: Premium visual design with blur effects and gradients
 - **Smooth Animations**: Professional micro-interactions and transitions
 - **Responsive Layout**: Optimized for desktop, tablet, and mobile devices
+- **Mobile-First Redesign (2.3)**:
+  - Hamburger navigation with slide-in drawer on mobile
+  - Accordion-style layout for the 4 learning modes on small screens
+  - Touch-friendly controls and no horizontal scrolling on iPhone sizes
+
+### ⚡ **Ekakshar – One-Word & Bullet Answers (2.3)**
+- **Ekakshar Mode** for:
+  - One-word answers
+  - Short bullet summaries (3–5 points)
+  - Quick definitions and vocab
+- Gradient + glassmorphism answer card with copy, download, share, and "Expand Answer" actions.
 
 ## 👥 Meet Our Team
 
@@ -35,7 +53,10 @@ Learn about the talented individuals who built MiniMind: [Team Overview](TEAM.md
 
 ## 🚀 Live Demo
 
-Experience MiniMind in action: **[Launch MiniMind](https://yuvibundela.github.io/Minimind2.1/)**
+MiniMind 2.3 is designed to be deployed on **Netlify** using Vite’s production build.
+
+- After you connect this repo to Netlify, your live URL will look like: `https://<your-site-name>.netlify.app`
+- Update this section with your actual Netlify URL once deployed.
 
 ## 🛠️ Technology Stack
 
@@ -50,10 +71,11 @@ Experience MiniMind in action: **[Launch MiniMind](https://yuvibundela.github.io
 - **OpenRouter API**: Advanced AI model integration for intelligent responses
 - **Web Speech API**: Natural text-to-speech synthesis
 - **Custom AI Service**: Optimized API handling with 2000 token limit
+- **Netlify Function (minimind-llm)**: Optional serverless endpoint for unified AI access
 
 ### **Deployment & Performance**
-- **GitHub Pages**: Reliable, fast hosting
-- **GitHub Actions**: Automated deployment workflow
+- **Netlify**: Optimized for Vite builds and serverless functions
+- **GitHub Actions (optional)**: Existing workflows for CI and alternative deployment
 - **Progressive Enhancement**: Works across all modern browsers
 
 ## 📖 Documentation
@@ -77,8 +99,8 @@ Experience MiniMind in action: **[Launch MiniMind](https://yuvibundela.github.io
 
 ```bash
 # Clone the repository
-git clone https://github.com/Yuvibundela/Minimind2.1.git
-cd Minimind2.1
+git clone https://github.com/YuvrajBundela29/Minimind2.3.git
+cd Minimind2.3
 
 # Install dependencies
 npm install
@@ -105,8 +127,14 @@ npm run build
 # Preview production build
 npm run preview
 
-# Deploy to GitHub Pages
-npm run deploy
+# Deploy to Netlify (recommended)
+# 1. Connect this repo (Minimind2.3) in the Netlify dashboard
+# 2. Set build command: npm run build
+# 3. Set publish directory: dist
+## OR use the Netlify CLI from the project root:
+## npm install -g netlify-cli
+## netlify init
+## netlify deploy --build --prod
 ```
 
 ## 📁 Project Structure
@@ -158,9 +186,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/Yuvibundela/Minimind2.1/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Yuvibundela/Minimind2.1/discussions)
-- **Maintainer**: [Yuvibundela](https://github.com/Yuvibundela)
+- **Issues**: [GitHub Issues](https://github.com/YuvrajBundela29/Minimind2.3/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/YuvrajBundela29/Minimind2.3/discussions)
+- **Maintainer**: [YuvrajBundela29](https://github.com/YuvrajBundela29)
 
 ---
 
