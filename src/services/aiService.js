@@ -1,6 +1,7 @@
 // AI Service for MiniMind
 // Note: API key should be set via environment variables in production
 const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || 'your-api-key-here';
+console.log('MiniMind: VITE_OPENROUTER_API_KEY loaded?', !!import.meta.env.VITE_OPENROUTER_API_KEY);
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 // Note: Using browser-compatible translation approach instead of Node.js library
@@ -107,7 +108,7 @@ class AIService {
     
     // Check if API key is properly configured
     if (!this.apiKey || this.apiKey === 'your-api-key-here') {
-      console.warn('⚠️ OpenRouter API key not configured. Please set VITE_OPENROUTER_API_KEY in your .env.local file.');
+      console.error('❌ OpenRouter API key not configured on Netlify. Add VITE_OPENROUTER_API_KEY in Site settings → Environment variables.');
     }
   }
 
