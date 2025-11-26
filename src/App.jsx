@@ -28,7 +28,7 @@ import {
   Share2
 } from 'lucide-react';
 // Using the new NetlifyAIService which communicates with our secure Netlify Function
-import AIService from './services/netlifyAIService.js';
+import AIService from './services/aiService.js';
 import { transliterate } from 'transliteration';
 import './App.css';
 
