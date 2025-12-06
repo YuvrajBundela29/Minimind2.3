@@ -1767,7 +1767,7 @@ Shared from MiniMind AI`;
                     whileTap={{ scale: 0.95 }}
                     title="Voice Input"
                   >
-                    <Mic size={16} />
+                    <Mic size={20} />
                   </motion.button>
                   
                   <input
@@ -2200,15 +2200,6 @@ Shared from MiniMind AI`;
                       <span className="mode-icon">{modes[fullscreenMode].icon}</span>
                       <h2>{modes[fullscreenMode].name} Mode</h2>
                     </div>
-                    
-                    <ModeSwitcher 
-                      currentMode={fullscreenMode}
-                      onModeChange={handleFullscreenModeChange}
-                      enabledModes={enabledModes}
-                      answers={answers}
-                      question={question}
-                    />
-                    
                     <button
                       className="back-btn"
                       onClick={() => setFullscreenMode(null)}
