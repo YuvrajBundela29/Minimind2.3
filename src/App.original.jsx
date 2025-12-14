@@ -27,90 +27,1017 @@ import {
   Download,
   Share2
 } from 'lucide-react';
+// Using the new NetlifyAIService which communicates with our secure Netlify Function
 import AIService from './services/aiService.js';
 import { transliterate } from 'transliteration';
 import './App.css';
-import './mobile.css'; // Import mobile-specific styles
 
 // Speech Controls Component
 const SpeechControls = ({ onSpeak, onPause, onResume, onStop, isSpeaking, isPaused, text, mode }) => {
   return (
     <div className="speech-controls">
-      {/* ... */}
+      {!isSpeaking ? (
+        <motion.button
+          className="speak-btn"
+          onClick={() => onSpeak(text, mode)}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          title="Read Aloud"
+        >
+          <Volume2 size={16} />
+        </motion.button>
+      ) : (
+        <div className="speech-control-group">
+          {isPaused ? (
+            <motion.button
+              className="speech-btn resume-btn"
+              onClick={onResume}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              title="Resume"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </motion.button>
+          ) : (
+            <motion.button
+              className="speech-btn pause-btn"
+              onClick={onPause}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              title="Pause"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+              </svg>
+            </motion.button>
+          )}
+          <motion.button
+            className="speech-btn stop-btn"
+            onClick={onStop}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            title="Stop"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            </svg>
+          </motion.button>
+        </div>
+      )}
     </div>
   );
 };
 
-// ... (rest of the code remains the same)
+// Mode configurations
+const modes = {
+  beginner: {
+    name: 'Beginner',
+    icon: '🌱',
+    color: '#CDE8D6',
+    accent: '#4ECDC4',
+    theme: 'beginner',
+  },
+  thinker: {
+    name: 'Thinker',
+    icon: '🧠',
+    color: '#E4D9FF',
+    accent: '#9C88FF',
+    theme: 'thinker',
+  },
+  story: {
+    name: 'Story',
+    icon: '📖',
+    color: '#FFF3CD',
+    accent: '#FFB74D',
+    theme: 'story',
+  },
+  mastery: {
+    name: 'Mastery',
+    icon: '🎓',
+    color: '#D6E4F0',
+    accent: '#42A5F5',
+    theme: 'mastery',
+  },
+};
 
-const App = () => {
-  // State for mobile menu and UI
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+// Language to transliteration map
+const languageTransliterationMap = {
+  hi: 'hi', // Hindi
+  bn: 'bn', // Bengali
+  ta: 'ta', // Tamil
+  te: 'te', // Telugu
+  ml: 'ml', // Malayalam
+  kn: 'kn', // Kannada
+  gu: 'gu', // Gujarati
+  pa: 'pa', // Punjabi
+  or: 'or', // Odia
+  as: 'as', // Assamese
+  mr: 'mr', // Marathi
+  ne: 'ne', // Nepali
+  sa: 'sa', // Sanskrit
+  ur: 'ur', // Urdu
+  sd: 'sd', // Sindhi
+  ks: 'ks', // Kashmiri
+  doi: 'doi', // Dogri
+  mni: 'mni', // Manipuri
+  sat: 'sat', // Santali
+  mai: 'mai', // Maithili
+  kok: 'kok', // Konkani
+  bho: 'bho', // Bhojpuri
+  bod: 'bod', // Bodo
+  raj: 'hi', // Rajasthani (using Hindi as base)
+  ar: 'ar', // Arabic
+  fa: 'fa', // Persian/Farsi
+  ru: 'ru', // Russian
+  zh: 'zh', // Chinese (pinyin)
+  ja: 'ja', // Japanese (romaji)
+  ko: 'ko', // Korean (romaja)
+};
+
+// Enhanced languages configuration with all Indian languages and casual mode
+const languages = {
+  en: { name: 'English', flag: '🇺🇸', nativeName: 'English', casual: false },
+  hi: { name: 'Hindi', flag: '🇮🇳', nativeName: 'हिंदी', casual: 'Hindi (Roman)' },
+  ur: { name: 'Urdu', flag: '🇵🇰', nativeName: 'اردو', casual: 'Urdu (Roman)' },
+  ta: { name: 'Tamil', flag: '🇮🇳', nativeName: 'தமிழ்', casual: 'Tamil (Roman)' },
+  ml: { name: 'Malayalam', flag: '🇮🇳', nativeName: 'മലയാളം', casual: 'Malayalam (Roman)' },
+  bn: { name: 'Bengali', flag: '🇧🇩', nativeName: 'বাংলা', casual: 'Bengali (Roman)' },
+  pa: { name: 'Punjabi', flag: '🇮🇳', nativeName: 'ਪੰਜਾਬੀ', casual: 'Punjabi (Roman)' },
+  gu: { name: 'Gujarati', flag: '🇮🇳', nativeName: 'ગુજરાતી', casual: 'Gujarati (Roman)' },
+  kn: { name: 'Kannada', flag: '🇮🇳', nativeName: 'ಕನ್ನಡ', casual: 'Kannada (Roman)' },
+  te: { name: 'Telugu', flag: '🇮🇳', nativeName: 'తెలుగు', casual: 'Telugu (Roman)' },
+  or: { name: 'Odia', flag: '🇮🇳', nativeName: 'ଓଡ଼ିଆ', casual: 'Odia (Roman)' },
+  as: { name: 'Assamese', flag: '🇮🇳', nativeName: 'অসমীয়া', casual: 'Assamese (Roman)' },
+  ne: { name: 'Nepali', flag: '🇳🇵', nativeName: 'नेपाली', casual: 'Nepali (Roman)' },
+  mr: { name: 'Marathi', flag: '🇮🇳', nativeName: 'मराठी', casual: 'Marathi (Roman)' },
+  sa: { name: 'Sanskrit', flag: '🇮🇳', nativeName: 'संस्कृतम्', casual: 'Sanskrit (Roman)' },
+  sd: { name: 'Sindhi', flag: '🇮🇳', nativeName: 'سنڌي', casual: 'Sindhi (Roman)' },
+  ks: { name: 'Kashmiri', flag: '🇮🇳', nativeName: 'कॉशुर', casual: 'Kashmiri (Roman)' },
+  doi: { name: 'Dogri', flag: '🇮🇳', nativeName: 'डोगरी', casual: 'Dogri (Roman)' },
+  mni: { name: 'Manipuri', flag: '🇮🇳', nativeName: 'ꯃꯤꯇꯩꯂꯣꯟ', casual: 'Manipuri (Roman)' },
+  sat: { name: 'Santali', flag: '🇮🇳', nativeName: 'ᱥᱟᱱᱛᱟᱲᱤ', casual: 'Santali (Roman)' },
+  mai: { name: 'Maithili', flag: '🇮🇳', nativeName: 'मैथिली', casual: 'Maithili (Roman)' },
+  kok: { name: 'Konkani', flag: '🇮🇳', nativeName: 'कोंकणी', casual: 'Konkani (Roman)' },
+  bho: { name: 'Bhojpuri', flag: '🇮🇳', nativeName: 'भोजपुरी', casual: 'Bhojpuri (Roman)' },
+  bod: { name: 'Bodo', flag: '🇮🇳', nativeName: 'बड़ो', casual: 'Bodo (Roman)' },
+  hinglish: { name: 'Hinglish', flag: '🇮🇳', nativeName: 'Hinglish', casual: false },
+  // International languages
+  es: { name: 'Spanish', flag: '🇪🇸', nativeName: 'Español', casual: false },
+  fr: { name: 'French', flag: '🇫🇷', nativeName: 'Français', casual: false },
+  de: { name: 'German', flag: '🇩🇪', nativeName: 'Deutsch', casual: false },
+  zh: { name: 'Chinese', flag: '🇨🇳', nativeName: '中文', casual: false },
+  ja: { name: 'Japanese', flag: '🇯🇵', nativeName: '日本語', casual: false },
+  ko: { name: 'Korean', flag: '🇰🇷', nativeName: '한국어', casual: false },
+  pt: { name: 'Portuguese', flag: '🇵🇹', nativeName: 'Português', casual: false },
+  ru: { name: 'Russian', flag: '🇷🇺', nativeName: 'Русский', casual: false },
+  ar: { name: 'Arabic', flag: '🇸🇦', nativeName: 'العربية', casual: false },
+  it: { name: 'Italian', flag: '🇮🇹', nativeName: 'Italiano', casual: false },
+  nl: { name: 'Dutch', flag: '🇳🇱', nativeName: 'Nederlands', casual: false },
+  tr: { name: 'Turkish', flag: '🇹🇷', nativeName: 'Türkçe', casual: false },
+  pl: { name: 'Polish', flag: '🇵🇱', nativeName: 'Polski', casual: false },
+  vi: { name: 'Vietnamese', flag: '🇻🇳', nativeName: 'Tiếng Việt', casual: false },
+  th: { name: 'Thai', flag: '🇹🇭', nativeName: 'ไทย', casual: false },
+  id: { name: 'Indonesian', flag: '🇮🇩', nativeName: 'Bahasa Indonesia', casual: false },
+  ms: { name: 'Malay', flag: '🇲🇾', nativeName: 'Bahasa Melayu', casual: false },
+  // Rajasthani language
+  raj: { name: 'Rajasthani', flag: '🇮🇳', nativeName: 'राजस्थानी', casual: 'Rajasthani (Roman)' },
+};
+
+// Navigation items with professional icons for minimized view
+const navigationItems = [
+  { id: 'home', icon: Home, label: 'Learn', color: '#2563eb' },
+  { id: 'progress', icon: BarChart3, label: 'Progress', color: '#059669' },
+  { id: 'oneword', icon: Brain, label: 'Ekakshar', color: '#7c3aed' },
+  { id: 'history', icon: History, label: 'History', color: '#d97706' },
+  { id: 'about', icon: User, label: 'About Us', color: '#8b5cf6' },
+  { id: 'faq', icon: GraduationCap, label: 'FAQ', color: '#0891b2' },
+  { id: 'language', icon: Languages, label: 'Language', color: '#0891b2' },
+  { id: 'settings', icon: Cog, label: 'Settings', color: '#6b7280' },
+];
+
+// Enhanced Mode switcher for fullscreen with smooth transitions
+const ModeSwitcher = ({ currentMode, onModeChange, enabledModes, answers, question }) => {
+  const handleModeSwitch = (newMode) => {
+    if (enabledModes[newMode] && newMode !== currentMode) {
+      onModeChange(newMode, answers[newMode], question);
+    }
+  };
+
+  return (
+    <div className="mode-switcher">
+      {Object.entries(modes).map(([modeKey, modeConfig]) => (
+        <motion.button
+          key={modeKey}
+          className={`mode-switch-btn ${
+            currentMode === modeKey ? 'active' : ''
+          } ${!enabledModes[modeKey] ? 'disabled' : ''}`}
+          onClick={() => handleModeSwitch(modeKey)}
+          disabled={!enabledModes[modeKey]}
+          whileHover={{ scale: enabledModes[modeKey] ? 1.05 : 1 }}
+          whileTap={{ scale: enabledModes[modeKey] ? 0.95 : 1 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        >
+          <span className="mode-icon">{modeConfig.icon}</span>
+          <span className="mode-name">{modeConfig.name}</span>
+          {answers && answers[modeKey] && (
+            <motion.div 
+              className="answer-indicator"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2 }}
+            />
+          )}
+        </motion.button>
+      ))}
+    </div>
+  );
+};
+
+// Mode filter dropdown
+const ModeFilter = ({ enabledModes, onToggleMode }) => {
+  const [isOpen, setIsOpen] = useState(false);
   
-  // History search and filtering state
+  return (
+    <div className="mode-filter">
+      <button 
+        className="filter-toggle"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>Modes</span>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          ▼
+        </motion.div>
+      </button>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="filter-dropdown"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            {Object.entries(modes).map(([modeKey, modeConfig]) => (
+              <label key={modeKey} className="filter-option">
+                <input
+                  type="checkbox"
+                  checked={enabledModes[modeKey]}
+                  onChange={() => onToggleMode(modeKey)}
+                />
+                <span className="mode-icon">{modeConfig.icon}</span>
+                <span>{modeConfig.name}</span>
+              </label>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+function App() {
+  const [currentPage, setCurrentPage] = useState('home');
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [casualMode, setCasualMode] = useState(false);
+  const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+  const [languageSearchTerm, setLanguageSearchTerm] = useState('');
+  const [isTranslationModalOpen, setIsTranslationModalOpen] = useState(false);
+  const [translationText, setTranslationText] = useState('');
+  const [translatedText, setTranslatedText] = useState('');
+  const [translationSourceLanguage, setTranslationSourceLanguage] = useState('en');
+  const [translationTargetLanguage, setTranslationTargetLanguage] = useState('hi');
+  const [navExpanded, setNavExpanded] = useState(false);
+  const [question, setQuestion] = useState('');  
+  const [answers, setAnswers] = useState({});
+  const [fullscreenMode, setFullscreenMode] = useState(null);
+  const [chatMessages, setChatMessages] = useState({});
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+  const [activeMobileMode, setActiveMobileMode] = useState('beginner');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isAnswering, setIsAnswering] = useState(false);
+  const [loadingModes, setLoadingModes] = useState({});
+  const [refinedPrompt, setRefinedPrompt] = useState('');
+  const [showRefinedPrompt, setShowRefinedPrompt] = useState(false);
+  const [isRefining, setIsRefining] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [enabledModes, setEnabledModes] = useState({
+    beginner: true,
+    thinker: true,
+    story: true,
+    mastery: true,
+  });
+  const [theme, setTheme] = useState('light');
+  const [history, setHistory] = useState([]);
+  const [settings, setSettings] = useState({
+    fontSize: 'medium',
+    soundEnabled: true,
+    defaultMode: 'beginner',
+    voiceLanguage: 'en',
+    emojisEnabled: true,
+    autoScroll: true,
+    // New settings for translator
+    transliterationEnabled: true,
+    scriptPreference: 'native', // 'native' or 'english'
+    autoTranslation: true, // 'auto' or 'manual'
+    typingTranslatorEnabled: false, // GBoard-like real-time typing translator
+  });
+  const [currentSpeech, setCurrentSpeech] = useState(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speechPaused, setSpeechPaused] = useState(false);
+  // New state for smart search
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  // New state for contextual learning
+  const [showContextualPanel, setShowContextualPanel] = useState(false);
+  const [relatedTopics, setRelatedTopics] = useState([]);
+  const [isGeneratingRelatedTopics, setIsGeneratingRelatedTopics] = useState(false);
+  // New state for history features
   const [historySearchTerm, setHistorySearchTerm] = useState('');
-  const [historyFilterMode, setHistoryFilterMode] = useState('all');
-  const [historyFilterLanguage, setHistoryFilterLanguage] = useState('all');
+  const [historyFilterMode, setHistoryFilterMode] = useState('');
+  const [historyFilterLanguage, setHistoryFilterLanguage] = useState('');
   const [historySortBy, setHistorySortBy] = useState('newest');
+  // Suggested prompts for the hero section
+  const [showSuggestedPrompts, setShowSuggestedPrompts] = useState(true);
   
-  // Toggle dark mode
+  // Generate random curiosity-testing prompts
+  const generateRandomPrompts = () => {
+    const promptSets = [
+      [
+        "What would happen if humans could photosynthesize like plants?",
+        "Can AI truly understand human emotions or just simulate them?",
+        "What if Earth had two moons instead of one?",
+        "How would society change if we didn't need to sleep?",
+        "What would happen if all humans could read minds?",
+        "Why do we have different personalities and what shapes them?"
+      ],
+      [
+        "What would the world be like if the Internet was never invented?",
+        "Could we upload human consciousness to computers?",
+        "What if animals could talk to humans?",
+        "How would Earth be different if dinosaurs never went extinct?",
+        "What would happen if gravity was twice as strong?",
+        "Can we create artificial gravity without spinning?"
+      ],
+      [
+        "What if we discovered a new color humans can see?",
+        "How would civilization change if we lived 500 years instead of 80?",
+        "What would happen if we could control the weather?",
+        "What if humans had evolved with echolocation like bats?",
+        "Could we terraform Mars to be more Earth-like?",
+        "What would happen if we found a parallel universe?"
+      ],
+      [
+        "What if money didn't exist and we used a different system?",
+        "How would humans adapt if Earth's atmosphere was 50% denser?",
+        "What if we could pause time for everyone except ourselves?",
+        "Could we build a real lightsaber like in Star Wars?",
+        "What if humans had evolved with natural armor like armadillos?",
+        "What would happen if we could teleport instantly anywhere?"
+      ],
+      [
+        "What if plants were conscious and could communicate with us?",
+        "How would society change if humans could regenerate limbs like lizards?",
+        "What would happen if we could see in infrared or ultraviolet?",
+        "Could we create a force field like in science fiction?",
+        "What if humans had evolved with natural sonar like dolphins?",
+        "What would happen if we discovered a new fundamental force of physics?"
+      ]
+    ];
+    
+    // Get a random set of prompts
+    const randomIndex = Math.floor(Math.random() * promptSets.length);
+    return promptSets[randomIndex];
+  };
+  
+  const [suggestedPrompts, setSuggestedPrompts] = useState(() => generateRandomPrompts());
+
+  // Function to generate dynamic prompts based on user input
+  const generateDynamicPrompts = async (userQuestion) => {
+    try {
+      // Use random curiosity-testing prompts instead of category-based ones
+      setSuggestedPrompts(generateRandomPrompts());
+    } catch (error) {
+      console.error('Error generating dynamic prompts:', error);
+      // Fallback to default curiosity-building prompts
+      setSuggestedPrompts([
+        "What would happen if all humans could read minds?",
+        "Why do we have different personalities and what shapes them?",
+        "What would happen if we discovered life on another planet?",
+        "How would society change if we didn't need to sleep?",
+        "What would happen if we could live forever?"
+      ]);
+    }
+  };
+  
+  const inputRef = useRef(null);
+  const chatContainerRef = useRef(null);
+
+  // Track viewport width for mobile-specific UI (accordion & nav)
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.setAttribute('data-theme', 'dark');
+    const handleResize = () => {
+      if (typeof window !== 'undefined') {
+        setIsMobile(window.innerWidth < 768);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Auto-scroll to bottom when new messages are added
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages, fullscreenMode]);
+
+  // Function to format AI answers with bold text instead of stars and hashtags
+  const formatAnswer = (answer) => {
+    if (answer == null) return '';
+
+    // Ensure we always work with a string to avoid runtime errors when
+    // the AI returns structured content or unexpected types.
+    let formatted = typeof answer === 'string' ? answer : String(answer);
+    
+    // Remove hashtags and format as section headers
+    formatted = formatted.replace(/###\s*(.*?)\n/g, '<h3 class="section-header">$1</h3>');
+    formatted = formatted.replace(/##\s*(.*?)\n/g, '<h2 class="section-header">$1</h2>');
+    formatted = formatted.replace(/#\s*(.*?)\n/g, '<h4 class="section-header">$1</h4>');
+    
+    // Convert markdown-style bold (**text**) to HTML bold with primary highlight theme
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="highlight-text theme-bold">$1<\/strong>');
+
+    // Convert single-asterisk wrapped text (*text*) to a tilt/italic style,
+    // avoiding list markers or parts of **bold** that were already handled.
+    formatted = formatted.replace(/(^|[\s(])\*(?!\*)([^*]+?)\*(?=[\s).,!?:;]|$)/g, '$1<em class="tilt-text">$2<\/em>');
+
+    // Double-underscore __text__ for bold text with a soft background highlight
+    formatted = formatted.replace(/__([^_]+?)__/g, '<strong class="highlight-bg">$1<\/strong>');
+
+    // Caret markers ^^text^^ for slightly larger, attention-grabbing text
+    formatted = formatted.replace(/\^\^(.*?)\^\^/g, '<span class="large-text">$1<\/span>');
+    
+    // Format numbered lists
+    formatted = formatted.replace(/^(\d+\.)\s*(.*?)$/gm, '<div class="numbered-item"><span class="number">$1</span><span class="content">$2</span></div>');
+    
+    // Format bullet points with different markers
+    formatted = formatted.replace(/^[-•*]\s*(.*?)$/gm, '<div class="bullet-item"><span class="bullet">•<\/span><span class="content">$1<\/span><\/div>');
+    
+    // Format mathematical formulas (LaTeX-like) with better handling
+    // Handle incomplete formulas first
+    formatted = formatted.replace(/\\\[([^\]]*?)(?:\\\]|$)/gs, '<div class="formula-block">$1</div>');
+    formatted = formatted.replace(/\\\(([^\)]*?)(?:\\\)|$)/g, '<span class="formula-inline">$1</span>');
+    
+    // Handle standard LaTeX formatting
+    formatted = formatted.replace(/\\\[(.*?)\\\]/gs, '<div class="formula-block">$1</div>');
+    formatted = formatted.replace(/\\\((.*?)\\\)/g, '<span class="formula-inline">$1</span>');
+    
+    // Handle simple math expressions in square brackets
+    formatted = formatted.replace(/\[(.*?)\]/g, '<span class="formula-inline">$1</span>');
+    
+    // Format code blocks
+    formatted = formatted.replace(/```(.*?)```/gs, '<pre class="code-block">$1</pre>');
+    formatted = formatted.replace(/`(.*?)`/g, '<code class="inline-code">$1</code>');
+    
+    // Convert colons after terms to create definition-style formatting
+    formatted = formatted.replace(/^\s*([A-Za-z][^:]*?):\s*/gm, '<div class="definition-term">$1:</div>');
+    
+    // Add proper line breaks and spacing
+    formatted = formatted.replace(/\n\n/g, '<br><br>');
+    formatted = formatted.replace(/\n/g, '<br>');
+    
+    // Clean up extra spacing
+    formatted = formatted.replace(/(<br>){3,}/g, '<br><br>');
+    
+    return formatted;
+  };
+
+  // Enhanced theme and settings management
+  useEffect(() => {
+    // Load saved settings
+    const savedTheme = localStorage.getItem('minimind-theme') || 'light';
+    const savedSettings = JSON.parse(localStorage.getItem('minimind-settings') || '{}');
+    const savedHistory = JSON.parse(localStorage.getItem('minimind-history') || '[]');
+    const savedCasualMode = localStorage.getItem('minimind-casual-mode') === 'true';
+    
+    setTheme(savedTheme);
+    setSettings(prev => ({ ...prev, ...savedSettings }));
+    setHistory(savedHistory);
+    setCasualMode(savedCasualMode);
+    
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.documentElement.style.fontSize = savedSettings.fontSize === 'small' ? '14px' : 
+                                              savedSettings.fontSize === 'large' ? '18px' : '16px';
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('minimind-theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
+
+  const updateSettings = (newSettings) => {
+    const updatedSettings = { ...settings, ...newSettings };
+    setSettings(updatedSettings);
+    localStorage.setItem('minimind-settings', JSON.stringify(updatedSettings));
+    
+    // Apply font size changes
+    if (newSettings.fontSize) {
+      document.documentElement.style.fontSize = newSettings.fontSize === 'small' ? '14px' : 
+                                                newSettings.fontSize === 'large' ? '18px' : '16px';
+    }
+  };
+
+  const toggleCasualMode = () => {
+    const newCasualMode = !casualMode;
+    setCasualMode(newCasualMode);
+    localStorage.setItem('minimind-casual-mode', newCasualMode.toString());
+  };
+
+  // Function to handle transliteration
+  const handleTransliteration = (text) => {
+    // Only transliterate if the feature is enabled and we have a mapping
+    if (settings.transliterationEnabled && languageTransliterationMap[selectedLanguage]) {
+      try {
+        // For languages that need native script conversion
+        if (settings.scriptPreference === 'native') {
+          // Use the transliteration library to convert to native script
+          const transliteratedText = transliterate(text, {
+            locale: languageTransliterationMap[selectedLanguage]
+          });
+          return transliteratedText;
+        }
+      } catch (error) {
+        console.error('Transliteration error:', error);
+      }
+    }
+    return text;
+  };
+
+  // Enhanced question input handler with real-time transliteration (GBoard-like)
+  const handleQuestionChange = (e) => {
+    const inputValue = e.target.value;
+    
+    // Apply transliteration if enabled and in typing translator mode
+    let processedValue = inputValue;
+    
+    // Check if typing translator is enabled (real-time conversion as user types)
+    if (settings.typingTranslatorEnabled && languageTransliterationMap[selectedLanguage]) {
+      try {
+        // Convert English text to selected language script in real-time
+        processedValue = transliterate(inputValue, {
+          locale: languageTransliterationMap[selectedLanguage]
+        });
+      } catch (error) {
+        console.error('Real-time transliteration error:', error);
+      }
+    } 
+    // Otherwise use the existing transliteration logic
+    else if (settings.transliterationEnabled && settings.scriptPreference === 'native') {
+      processedValue = handleTransliteration(inputValue);
+    }
+    
+    setQuestion(processedValue);
+    
+    // Generate dynamic prompts based on user input (with debounce)
+    if (inputValue.trim().length > 3) {
+      clearTimeout(window.promptDebounce);
+      window.promptDebounce = setTimeout(() => {
+        generateDynamicPrompts(inputValue);
+      }, 500);
+    } else if (inputValue.trim().length === 0) {
+      // Reset to default prompts when input is cleared
+      setSuggestedPrompts([
+        "Explain quantum computing like I'm 5",
+        "What is a black hole?",
+        "How does the internet work?",
+        "Why do we dream?",
+        "How do airplanes fly?",
+        "What is artificial intelligence?"
+      ]);
+    }
+  };
+
+  // Save to history function
+  const saveToHistory = (question, answers, timestamp = Date.now()) => {
+    const historyEntry = {
+      id: timestamp,
+      question,
+      answers,
+      language: selectedLanguage,
+      casualMode: casualMode,
+      timestamp,
+      date: new Date(timestamp).toLocaleDateString(),
+      time: new Date(timestamp).toLocaleTimeString(),
+      pinned: false,
+    };
+    
+    const updatedHistory = [historyEntry, ...history.slice(0, 49)]; // Keep last 50 entries
+    setHistory(updatedHistory);
+    localStorage.setItem('minimind-history', JSON.stringify(updatedHistory));
+  };
+
+  // Update document language
+  useEffect(() => {
+    document.documentElement.lang = selectedLanguage === 'hinglish' ? 'hi' : selectedLanguage;
+  }, [selectedLanguage]);
+
+  // Add notification function
+  const addNotification = (message, type = 'error') => {
+    const id = Date.now();
+    const notification = { id, message, type };
+    setNotifications(prev => [...prev, notification]);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 5000);
+  };
+
+  // Remove notification
+  const removeNotification = (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
+
+  // Enhanced AI response function with casual mode support
+  const getAIResponse = async (prompt, mode, isRefinement = false) => {
+    try {
+      // Debug logging for casual mode
+      console.log('Casual Mode:', casualMode);
+      console.log('Selected Language:', selectedLanguage);
+      console.log('Language Config:', languages[selectedLanguage]);
+      
+      const effectiveLanguage = casualMode && languages[selectedLanguage]?.casual ? 
+        `${selectedLanguage}_casual` : selectedLanguage;
+      
+      console.log('Effective Language:', effectiveLanguage);
+      
+      if (isRefinement) {
+        return await AIService.refinePrompt(prompt, effectiveLanguage);
+      }
+      
+      // Get the AI response
+      let response = await AIService.getExplanation(prompt, mode, effectiveLanguage);
+      
+      // Translate if auto-translation is enabled and language is not English
+      if (settings.autoTranslation && selectedLanguage !== 'en') {
+        try {
+          console.log('Auto-translating response to', selectedLanguage);
+          const translatedResponse = await AIService.translateText(response, selectedLanguage, 'en');
+          console.log('Translated response:', translatedResponse);
+          response = translatedResponse;
+        } catch (translationError) {
+          console.error('Translation failed:', translationError);
+          // Continue with original response if translation fails
+        }
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      // Provide more specific error message for payment issues
+      if (error.message.includes('Payment required')) {
+        return 'Sorry, there is a payment issue with the AI service. Please check your OpenRouter account and billing information.';
+      }
+      return `Sorry, I'm having trouble connecting right now. Please try again in a moment. ${error.message}`;
+    }
+  };
+
+  // Enhanced question submission with history saving
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!question.trim()) return;
+
+    setIsAnswering(true);
+    setAnswers({});
+    setLoadingModes({});
+    
+    const timestamp = Date.now();
+    
+    // Get answers for all modes simultaneously
+    const modeKeys = Object.keys(modes).filter(key => enabledModes[key]);
+    const promises = modeKeys.map(async (modeKey) => {
+      setLoadingModes(prev => ({ ...prev, [modeKey]: true }));
+      try {
+        const answer = await getAIResponse(question, modeKey);
+        setAnswers(prev => ({ ...prev, [modeKey]: answer }));
+        setLoadingModes(prev => ({ ...prev, [modeKey]: false }));
+        return { [modeKey]: answer };
+      } catch (error) {
+        console.error(`Error for ${modeKey}:`, error);
+        // Provide more specific notification for payment issues
+        if (error.message.includes('Payment required')) {
+          addNotification(`Payment required for ${modes[modeKey].name} mode. Please check your OpenRouter account.`, 'error');
+        } else {
+          addNotification(`Failed to get ${modes[modeKey].name} explanation: ${error.message}`, 'error');
+        }
+        const errorMessage = error.message.includes('Payment required') 
+          ? 'Payment required for AI service. Please check your OpenRouter account and billing information.'
+          : 'Sorry, I encountered an error. Please try again.';
+        setAnswers(prev => ({ ...prev, [modeKey]: errorMessage }));
+        setLoadingModes(prev => ({ ...prev, [modeKey]: false }));
+        return { [modeKey]: errorMessage };
+      }
+    });
+    
+    // Wait for all responses and save to history
+    const results = await Promise.allSettled(promises);
+    const allAnswers = {};
+    results.forEach(result => {
+      if (result.status === 'fulfilled') {
+        Object.assign(allAnswers, result.value);
+      }
+    });
+    
+    // Save to history
+    saveToHistory(question, allAnswers, timestamp);
+    setIsAnswering(false);
+    
+    // Reset dynamic prompts after submission
+    setSuggestedPrompts(generateRandomPrompts());
+    // Show suggested prompts again after submission
+    setShowSuggestedPrompts(true);
+  };
+
+  // Handle prompt refinement
+  const handleRefinePrompt = async () => {
+    if (!question.trim()) return;
+    
+    setIsRefining(true);
+    setShowRefinedPrompt(true);
+    try {
+      const refined = await getAIResponse(question, 'beginner', true);
+      setRefinedPrompt(refined);
+    } catch (error) {
+      console.error('Error refining prompt:', error);
+      addNotification(`Failed to refine prompt: ${error.message}`);
+      setRefinedPrompt("Sorry, I couldn't refine your prompt right now. Please try again.");
+    } finally {
+      setIsRefining(false);
+    }
+  };
+
+  // Toggle mode enabled/disabled
+  const toggleMode = (modeKey) => {
+    setEnabledModes(prev => ({
+      ...prev,
+      [modeKey]: !prev[modeKey]
+    }));
+  };
+
+  const [onewordInput, setOnewordInput] = useState('');
+  const [onewordAnswer, setOnewordAnswer] = useState('');
+  const [isOnewordLoading, setIsOnewordLoading] = useState(false);
+
+  // OneWord quick answer function
+  const handleOnewordSubmit = async (e) => {
+    e.preventDefault();
+    if (!onewordInput.trim()) return;
+    
+    setIsOnewordLoading(true);
+    try {
+      const response = await AIService.getOneWordAnswer(onewordInput, selectedLanguage);
+      setOnewordAnswer(response);
+    } catch (error) {
+      console.error('OneWord error:', error);
+      // Provide more specific error message for payment issues
+      if (error.message.includes('Payment required')) {
+        addNotification('Payment required for OneWord feature. Please check your OpenRouter account.', 'error');
+        setOnewordAnswer('Payment required for AI service. Please check your OpenRouter account and billing information.');
+      } else {
+        addNotification(`OneWord error: ${error.message}`, 'error');
+        setOnewordAnswer('Sorry, I encountered an error.');
+      }
+    } finally {
+      setIsOnewordLoading(false);
+    }
+  };
+
+  // Function to clean text for speech (remove hashtags, markdown, emojis)
+  const cleanTextForSpeech = (text) => {
+    if (text == null) return '';
+
+    // Always operate on a string to avoid .replace on non-string values
+    let cleanText = typeof text === 'string' ? text : String(text);
+    
+    // Remove HTML tags
+    cleanText = cleanText.replace(/<[^>]*>/g, ' ');
+    
+    // Remove markdown formatting
+    cleanText = cleanText.replace(/\*\*(.*?)\*\*/g, '$1'); // Bold
+    cleanText = cleanText.replace(/\*(.*?)\*/g, '$1'); // Italic
+    cleanText = cleanText.replace(/`(.*?)`/g, '$1'); // Code
+    cleanText = cleanText.replace(/```[\s\S]*?```/g, ''); // Code blocks
+    
+    // Remove hashtags
+    cleanText = cleanText.replace(/#+ /g, '');
+    cleanText = cleanText.replace(/#/g, '');
+    
+    // Remove emojis
+    cleanText = cleanText.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
+    
+    // Remove special characters and extra spaces
+    cleanText = cleanText.replace(/[\*\-\+\=\|\[\]\(\)]/g, ' ');
+    cleanText = cleanText.replace(/\s+/g, ' ');
+    cleanText = cleanText.trim();
+    
+    // Add natural pauses at periods and commas
+    cleanText = cleanText.replace(/\./g, '.');
+    cleanText = cleanText.replace(/,/g, ', ');
+    
+    return cleanText;
+  };
+
+  // Enhanced speech controls
+  const stopSpeech = () => {
+    if (speechSynthesis.speaking) {
+      speechSynthesis.cancel();
+      setIsSpeaking(false);
+      setSpeechPaused(false);
+      setCurrentSpeech(null);
+    }
+  };
+
+  const pauseSpeech = () => {
+    if (speechSynthesis.speaking && !speechSynthesis.paused) {
+      speechSynthesis.pause();
+      setSpeechPaused(true);
+    }
+  };
+
+  const resumeSpeech = () => {
+    if (speechSynthesis.paused) {
+      speechSynthesis.resume();
+      setSpeechPaused(false);
+    }
+  };
+
+  // Fallback function for clipboard sharing
+  const fallbackToClipboard = (content, type) => {
+    const textToCopy = `MiniMind ${type}:
+
+${content}
+
+Shared from MiniMind AI`;
+    
+    // Try modern clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        addNotification('Answer copied to clipboard!', 'success');
+      }).catch((error) => {
+        console.error('Clipboard write failed:', error);
+        // Fallback to legacy execCommand
+        fallbackToLegacyCopy(textToCopy);
+      });
     } else {
-      document.documentElement.removeAttribute('data-theme');
+      // Fallback to legacy execCommand
+      fallbackToLegacyCopy(textToCopy);
     }
-  }, [isDarkMode]);
-
-  // Speech recognition result handler
-  const handleRecognitionResult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    setQuestion(transcript);
-    addNotification('✅ Voice input captured!', 'success');
   };
 
-  // Speech recognition error handler
-  const handleRecognitionError = (event) => {
-    console.error('Speech recognition error:', event.error);
-    let errorMessage = `❌ Voice input error: ${event.error}`;
+  // Legacy copy fallback
+  const fallbackToLegacyCopy = (text) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
     
-    // Provide specific error messages
-    if (event.error === 'no-speech') {
-      errorMessage = '❌ No speech detected. Please try again and speak clearly.';
-    } else if (event.error === 'audio-capture') {
-      errorMessage = '❌ No microphone found. Please check your device.';
-    } else if (event.error === 'not-allowed') {
-      errorMessage = '❌ Microphone access denied. Please allow microphone access in your browser settings.';
-    } else if (event.error === 'service-not-allowed') {
-      errorMessage = '❌ Speech service not allowed. Please check your browser settings.';
-    } else if (event.error === 'language-not-supported') {
-      errorMessage = `❌ Language ${languages[selectedLanguage]?.name || selectedLanguage} not supported for voice input. Try switching to English or Hindi.`;
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        addNotification('Answer copied to clipboard!', 'success');
+      } else {
+        addNotification('Failed to copy to clipboard', 'error');
+      }
+    } catch (error) {
+      console.error('Legacy copy failed:', error);
+      addNotification('Failed to copy to clipboard', 'error');
     }
     
-    addNotification(errorMessage, 'error');
+    document.body.removeChild(textArea);
   };
 
-  // Speech recognition end handler
-  const handleRecognitionEnd = () => {
-    addNotification('🎤 Voice input ended', 'info');
-  };
-
-  // Initialize speech recognition
-  const startVoiceInput = () => {
-    if ('webkitSpeechRecognition' in window) {
-      const recognition = new window.webkitSpeechRecognition();
+  // Enhanced voice input function with language and casual mode support
+  const handleVoiceInput = () => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      // Configure recognition
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = selectedLanguage;
-
-      recognition.onresult = handleRecognitionResult;
-      recognition.onerror = handleRecognitionError;
-      recognition.onend = handleRecognitionEnd;
-
+      recognition.maxAlternatives = 1;
+      
+      // Set language for recognition based on selected language and casual mode
+      let recognitionLanguage = 'en-US';
+      
+      if (selectedLanguage === 'en') {
+        recognitionLanguage = 'en-US';
+      } else if (selectedLanguage === 'hi') {
+        recognitionLanguage = casualMode ? 'hi-IN' : 'hi-IN';
+      } else if (selectedLanguage === 'bn') {
+        recognitionLanguage = 'bn-IN';
+      } else if (selectedLanguage === 'ta') {
+        recognitionLanguage = 'ta-IN';
+      } else if (selectedLanguage === 'te') {
+        recognitionLanguage = 'te-IN';
+      } else if (selectedLanguage === 'ml') {
+        recognitionLanguage = 'ml-IN';
+      } else if (selectedLanguage === 'kn') {
+        recognitionLanguage = 'kn-IN';
+      } else if (selectedLanguage === 'gu') {
+        recognitionLanguage = 'gu-IN';
+      } else if (selectedLanguage === 'pa') {
+        recognitionLanguage = 'pa-IN';
+      } else if (selectedLanguage === 'or') {
+        recognitionLanguage = 'or-IN';
+      } else if (selectedLanguage === 'as') {
+        recognitionLanguage = 'as-IN';
+      } else if (selectedLanguage === 'mr') {
+        recognitionLanguage = 'mr-IN';
+      } else if (selectedLanguage === 'ne') {
+        recognitionLanguage = 'ne-NP';
+      } else if (selectedLanguage === 'sa') {
+        recognitionLanguage = 'sa-IN';
+      } else if (selectedLanguage === 'ur') {
+        recognitionLanguage = 'ur-PK';
+      } else if (selectedLanguage === 'sd') {
+        recognitionLanguage = 'sd-PK';
+      } else if (selectedLanguage === 'ks') {
+        recognitionLanguage = 'ks-IN';
+      } else if (selectedLanguage === 'doi') {
+        recognitionLanguage = 'doi-IN';
+      } else if (selectedLanguage === 'mni') {
+        recognitionLanguage = 'mni-IN';
+      } else if (selectedLanguage === 'sat') {
+        recognitionLanguage = 'sat-IN';
+      } else if (selectedLanguage === 'mai') {
+        recognitionLanguage = 'mai-IN';
+      } else if (selectedLanguage === 'kok') {
+        recognitionLanguage = 'kok-IN';
+      } else if (selectedLanguage === 'bho') {
+        recognitionLanguage = 'bho-IN';
+      } else if (selectedLanguage === 'bod') {
+        recognitionLanguage = 'bod-IN';
+      } else if (selectedLanguage === 'raj') {
+        recognitionLanguage = 'hi-IN'; // Rajasthani uses Hindi recognition
+      } else if (selectedLanguage === 'hinglish') {
+        recognitionLanguage = 'hi-IN'; // Hinglish uses Hindi recognition
+      } else {
+        // For other languages, try to map or fallback to English
+        recognitionLanguage = `${selectedLanguage}-${selectedLanguage.toUpperCase()}`;
+      }
+      
+      recognition.lang = recognitionLanguage;
+      
+      recognition.onstart = () => {
+        addNotification(`🎤 Listening in ${languages[selectedLanguage]?.name || 'selected language'}... Speak now!`, 'success');
+      };
+      
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setQuestion(transcript);
+        addNotification('✅ Voice input captured!', 'success');
+      };
+      
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        let errorMessage = `❌ Voice input error: ${event.error}`;
+        
+        // Provide specific error messages
+        if (event.error === 'no-speech') {
+          errorMessage = '❌ No speech detected. Please try again and speak clearly.';
+        } else if (event.error === 'audio-capture') {
+          errorMessage = '❌ No microphone found. Please check your device.';
+        } else if (event.error === 'not-allowed') {
+          errorMessage = '❌ Microphone access denied. Please allow microphone access in your browser settings.';
+        } else if (event.error === 'service-not-allowed') {
+          errorMessage = '❌ Speech service not allowed. Please check your browser settings.';
+        } else if (event.error === 'language-not-supported') {
+          errorMessage = `❌ Language ${languages[selectedLanguage]?.name || selectedLanguage} not supported for voice input. Try switching to English or Hindi.`;
+        }
+        
+        addNotification(errorMessage, 'error');
+      };
+      
+      recognition.onend = () => {
+        addNotification('🎤 Voice input ended', 'info');
+      };
+      
       try {
         recognition.start();
-        addNotification('🎤 Listening... Speak now!', 'info');
       } catch (error) {
         console.error('Speech recognition start error:', error);
         addNotification('❌ Failed to start voice input. Please try again.', 'error');
