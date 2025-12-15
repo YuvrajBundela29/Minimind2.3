@@ -17,6 +17,16 @@
 }
 
 /* Mobile App Container */
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
 .mobile-app {
   position: fixed;
   top: 0;
@@ -25,8 +35,9 @@
   bottom: 0;
   display: flex;
   flex-direction: column;
-  max-width: 100%;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
   overflow: hidden;
   background-color: var(--background);
 }
@@ -40,21 +51,30 @@
   height: var(--header-height);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
+  padding: 0 12px;
   background-color: var(--header-bg);
   z-index: 100;
   box-shadow: var(--shadow-sm);
   border-bottom: 1px solid var(--border-color);
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .menu-button {
   background: none;
   border: none;
+  width: 44px;
+  height: 44px;
   padding: 8px;
-  margin-left: -8px;
+  margin: 0;
   color: var(--text-primary);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .app-title {
@@ -64,18 +84,60 @@
   margin: 0 auto;
   text-align: center;
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  width: 100%;
+  pointer-events: none;
+  padding: 0 60px; /* Space for buttons on both sides */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+  margin: 0;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Main Content */
 .mobile-content {
   flex: 1;
-  padding: calc(var(--header-height) + 16px) 16px calc(var(--input-height) + 16px);
+  padding: var(--header-height) 0 calc(var(--input-height) + env(safe-area-inset-bottom));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   width: 100%;
   max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.mobile-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.mode-selection {
+  width: 100%;
+  max-width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
   margin: 0 auto;
 }
 
@@ -86,8 +148,9 @@
   gap: 16px;
   width: 100%;
   max-width: 100%;
-  margin: 0 auto;
-  padding-bottom: 16px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .mode-card {
@@ -143,19 +206,21 @@
   right: 0;
   background: var(--bg-primary);
   border-top: 1px solid var(--border-color);
-  padding: 8px 16px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
   gap: 8px;
   z-index: 100;
-  padding-bottom: calc(8px + var(--safe-area-bottom));
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  margin: 0;
 }
 
 .input-wrapper {
   flex: 1;
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
 .chat-input {
@@ -315,17 +380,97 @@ html {
   margin-right: 0;
 }
 
-/* Ensure full viewport height on mobile */
+/* Ensure full viewport height on all devices */
 html, body, #root, .App {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Fix for mobile viewport units */
 @supports (-webkit-touch-callout: none) {
   .mobile-app {
-    /* The hack for Safari */
     height: -webkit-fill-available;
   }
+}
+
+/* Global touch target improvements */
+button, [role="button"], [role="tab"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* Prevent text size adjustment */
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Remove default button styling */
+button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Ensure images and embeds don't overflow */
+img, embed, iframe, object, video {
+  max-width: 100%;
+  height: auto;
+  border: 0;
+}
+
+/* Remove default list styling */
+ul, ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Remove default link styling */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Remove default form element styling */
+input, textarea, select, button {
+  font-family: inherit;
+  font-size: 100%;
+  margin: 0;
+  vertical-align: baseline;
+}
+
+/* Remove default fieldset styling */
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove default table styling */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Remove default quote styling */
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
 }

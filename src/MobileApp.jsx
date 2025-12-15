@@ -255,6 +255,11 @@ const MobileApp = ({
             onBlur={() => setIsInputFocused(false)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             aria-label="Type your question"
+            enterKeyHint="send"
+            autoCapitalize="sentences"
+            autoComplete="off"
+            autoCorrect="on"
+            spellCheck="true"
           />
           {question ? (
             <button 
