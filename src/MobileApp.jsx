@@ -16,9 +16,7 @@ import {
   History,
   Languages,
   Download,
-  Share2,
-  ChevronDown,
-  ChevronUp
+  Share2
 } from 'lucide-react';
 import './mobile.css';
 
@@ -48,10 +46,9 @@ const MobileApp = ({
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
-  const [expandedModes, setExpandedModes] = useState({});
+  const [showModeCards, setShowModeCards] = useState(true);
   const contentRef = useRef(null);
   const inputRef = useRef(null);
-  const [selectedMode, setSelectedMode] = useState(currentMode);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -90,83 +87,68 @@ const MobileApp = ({
     }
   };
 
-  // Toggle mode expansion
-  const toggleModeExpansion = (modeId) => {
-    setExpandedModes(prev => ({
-      ...prev,
-      [modeId]: !prev[modeId]
-    }));
-  };
-
-  // Render mode cards with expandable content
+  // Render mode cards
   const renderModeCards = () => (
     <div className="mode-cards-container">
-      {Object.entries(modes).map(([id, mode]) => {
-        const isExpanded = expandedModes[id] || false;
-        const hasAnswer = answers[id] && answers[id].trim() !== '';
-        
-        return (
-          <motion.div
-            key={id}
-            className={`mode-card ${currentMode === id ? 'active' : ''} ${isExpanded ? 'expanded' : ''}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="mode-card-content">
-              <div 
-                className="mode-card-header"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleModeExpansion(id);
-                }}
-              >
-                <div className="mode-icon">
-                  {mode.icon || <Sparkles size={20} />}
-                </div>
-                <h3 className="mode-title">{mode.name}</h3>
-                <div className="mode-badge">{mode.badge}</div>
-                <button 
-                  className={`expand-button ${isExpanded ? 'expanded' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleModeExpansion(id);
-                  }}
-                >
-                  {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                </button>
-              </div>
-              
-              <div className={`mode-card-body ${isExpanded ? 'expanded' : ''}`}>
-                <p className="mode-description">{mode.description}</p>
-                
-                {hasAnswer && (
-                  <div className="mode-answer">
-                    <div className="answer-content" dangerouslySetInnerHTML={{ __html: answers[id] }} />
-                  </div>
-                )}
-                
-                {currentMode === id && isSpeaking && (
-                  <div className="speech-controls">
-                    {isPaused ? (
-                      <button onClick={onResume} className="control-button">
-                        <Volume2 size={16} /> Resume
-                      </button>
-                    ) : (
-                      <button onClick={onPause} className="control-button">
-                        <Volume2 size={16} /> Pause
-                      </button>
-                    )}
-                    <button onClick={onStop} className="control-button">
-                      <X size={16} /> Stop
-                    </button>
-                  </div>
-                )}
-              </div>
+      {Object.entries(modes).map(([id, mode]) => (
+        <motion.div
+          key={id}
+          className={`mode-card ${currentMode === id ? 'active' : ''}`}
+          onClick={() => handleModeSelect(id)}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="mode-card-header">
+            <div 
+              className="mode-card-icon" 
+              style={{ 
+                background: mode.color || 'var(--bg-tertiary)',
+                color: mode.textColor || 'var(--text-primary)'
+              }}
+            >
+              {mode.icon || '✨'}
             </div>
-          </motion.div>
-        );
-      })}
+            <div style={{ flex: 1 }}>
+              <h3 className="mode-card-title">{mode.name}</h3>
+            </div>
+            <span 
+              className="mode-tag"
+              style={{
+                background: mode.color ? `${mode.color}20` : 'var(--bg-tertiary)',
+                color: mode.color || 'var(--text-secondary)'
+              }}
+            >
+              {mode.type?.toUpperCase() || 'MODE'}
+            </span>
+          </div>
+          <p className="mode-card-description">
+            {mode.description || 'Ask me anything in this mode'}
+          </p>
+          <div className="mode-card-actions">
+            <button 
+              className="mobile-btn secondary"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSpeak(mode.example || 'Ask me anything in this mode', currentMode);
+              }}
+            >
+              <Volume2 size={16} />
+            </button>
+            <button 
+              className="mobile-btn secondary"
+              onClick={(e) => {
+                e.stopPropagation();
+                setQuestion(mode.example || '');
+                inputRef.current?.focus();
+              }}
+            >
+              <Sparkles size={16} />
+              <span>Example</span>
+            </button>
+          </div>
+        </motion.div>
+      ))}
     </div>
   );
 
@@ -212,74 +194,80 @@ const MobileApp = ({
   );
 
   return (
-    <div className="mobile-app">
+    <div className="mobile-container" data-theme={theme}>
       {/* Header */}
       <header className="mobile-header">
-        <button 
-          className="menu-button" 
-          onClick={toggleMenu}
-          aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-        >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-        <h1 className="app-title">MiniMind</h1>
-        <div className="header-actions">
+        {!showModeCards ? (
+          <button className="mobile-header-btn" onClick={handleBack}>
+            <ArrowLeft size={24} />
+          </button>
+        ) : (
+          <button className="mobile-header-btn" onClick={toggleMenu}>
+            <Menu size={24} />
+          </button>
+        )}
+        
+        <h1 className="mobile-header-title">
+          {showModeCards ? 'MiniMind' : modes[currentMode]?.name || 'Chat'}
+        </h1>
+        
+        <div className="mobile-header-actions">
           <button 
-            className="theme-toggle" 
+            className="mobile-header-btn" 
             onClick={toggleTheme}
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </button>
+          
+          {!showModeCards && (
+            <button 
+              className="mobile-header-btn"
+              onClick={() => onSpeak(answers[currentMode] || '', currentMode)}
+              disabled={!answers[currentMode]}
+            >
+              <Volume2 size={20} />
+            </button>
+          )}
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="mobile-content" ref={contentRef}>
-        <div className="mode-selection">
-          {renderModeCards()}
-        </div>
+      <main className="mobile-content">
+        <AnimatePresence mode="wait">
+          {showModeCards ? renderModeCards() : renderChat()}
+        </AnimatePresence>
       </main>
 
       {/* Input Area */}
-      <div className="input-container">
-        <div className="input-wrapper">
-          <input
-            ref={inputRef}
-            type="text"
-            className="chat-input"
-            placeholder="Ask me anything..."
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            onFocus={() => setIsInputFocused(true)}
-            onBlur={() => setIsInputFocused(false)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            aria-label="Type your question"
-            enterKeyHint="send"
-            autoCapitalize="sentences"
-            autoComplete="off"
-            autoCorrect="on"
-            spellCheck="true"
-          />
-          {question ? (
-            <button 
-              className="send-button"
-              onClick={handleSend}
-              disabled={!question.trim()}
-              aria-label="Send message"
-            >
-              <Send size={20} />
-            </button>
-          ) : (
-            <button 
-              className="mic-button"
-              onClick={() => {}}
-              aria-label="Use voice input"
-            >
-              <Mic size={20} />
-            </button>
-          )}
-        </div>
+      <div className="mobile-input-container">
+        <button 
+          className="mobile-input-btn secondary"
+          onClick={() => onSpeak('', currentMode)}
+        >
+          <Mic size={20} />
+        </button>
+        
+        <input
+          ref={inputRef}
+          type="text"
+          className="mobile-input"
+          placeholder={`Ask ${modes[currentMode]?.name || 'MiniMind'}...`}
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          onFocus={() => setIsInputFocused(true)}
+          onBlur={() => setIsInputFocused(false)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+        />
+        
+        <button 
+          className="mobile-input-btn"
+          onClick={handleSend}
+          disabled={!question.trim()}
+          style={{ opacity: question.trim() ? 1 : 0.5 }}
+        >
+          <Send size={20} />
+        </button>
       </div>
 
       {/* Mobile Menu */}
