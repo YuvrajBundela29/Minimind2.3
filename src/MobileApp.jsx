@@ -16,7 +16,8 @@ import {
   History,
   Languages,
   Download,
-  Share2
+  Share2,
+  ChevronRight
 } from 'lucide-react';
 import './mobile.css';
 
@@ -46,24 +47,25 @@ const MobileApp = ({
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
-  const [showModeCards, setShowModeCards] = useState(true);
   const contentRef = useRef(null);
   const inputRef = useRef(null);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (contentRef.current) {
-      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+      const scrollHeight = contentRef.current.scrollHeight;
+      const height = contentRef.current.clientHeight;
+      const maxScrollTop = scrollHeight - height;
+      contentRef.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
     }
-  }, [answers, currentMode]);
+  }, [answers]);
 
   // Handle send message
   const handleSend = () => {
     if (question.trim()) {
       onSendMessage(question, currentMode);
       setQuestion('');
-      setShowModeCards(false);
-      // Focus input after sending
+      // Keep focus on input after sending
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   };
@@ -71,20 +73,12 @@ const MobileApp = ({
   // Handle mode selection
   const handleModeSelect = (modeId) => {
     onModeChange(modeId);
-    setShowModeCards(false);
     inputRef.current?.focus();
   };
 
   // Toggle menu
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  // Handle back button
-  const handleBack = () => {
-    if (!showModeCards) {
-      setShowModeCards(true);
-    }
   };
 
   // Render mode cards
@@ -98,6 +92,9 @@ const MobileApp = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
+          style={{
+            borderLeft: currentMode === id ? '4px solid var(--primary-color)' : '1px solid var(--border-color)'
+          }}
         >
           <div className="mode-card-header">
             <div 
@@ -152,119 +149,105 @@ const MobileApp = ({
     </div>
   );
 
-  // Render chat interface
-  const renderChat = () => (
-    <div className="chat-container">
-      <div className="chat-messages" ref={contentRef}>
-        {question && (
-          <div className="message user">
-            <div className="message-content">{question}</div>
+  // Render all mode responses
+  const renderModeResponses = () => {
+    return Object.entries(modes).map(([modeId, mode]) => {
+      const answer = answers[modeId];
+      if (!answer) return null;
+      
+      return (
+        <motion.div 
+          key={modeId}
+          className={`mode-response ${currentMode === modeId ? 'active' : ''}`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="mode-header" onClick={() => handleModeSelect(modeId)}>
+            <div className="mode-icon">{mode.icon}</div>
+            <div className="mode-name">{mode.name}</div>
+            <ChevronRight size={20} className="chevron" />
           </div>
-        )}
-        
-        {answers[currentMode] && (
-          <div className="message ai">
-            <div className="message-content">
-              {answers[currentMode]}
-            </div>
-            <div className="message-actions">
-              <button 
-                className="action-btn"
-                onClick={() => onSpeak(answers[currentMode], currentMode)}
-              >
-                <Volume2 size={16} />
-              </button>
-              <button 
-                className="action-btn"
-                onClick={() => onDownload(answers[currentMode], currentMode)}
-              >
-                <Download size={16} />
-              </button>
-              <button 
-                className="action-btn"
-                onClick={() => onShare(answers[currentMode], currentMode)}
-              >
-                <Share2 size={16} />
-              </button>
-            </div>
+          <div 
+            className="mode-answer"
+            dangerouslySetInnerHTML={{ __html: answer }}
+          />
+          <div className="message-actions">
+            <button 
+              className="action-btn" 
+              onClick={() => onSpeak(answer, modeId)}
+              aria-label="Listen to response"
+            >
+              <Volume2 size={16} />
+            </button>
+            <button 
+              className="action-btn" 
+              onClick={() => onShare(answer)}
+              aria-label="Share response"
+            >
+              <Share2 size={16} />
+            </button>
           </div>
-        )}
-      </div>
-    </div>
-  );
+        </motion.div>
+      );
+    });
+  };
 
   return (
-    <div className="mobile-container" data-theme={theme}>
+    <div className="mobile-app" data-theme={theme}>
       {/* Header */}
       <header className="mobile-header">
-        {!showModeCards ? (
-          <button className="mobile-header-btn" onClick={handleBack}>
-            <ArrowLeft size={24} />
-          </button>
-        ) : (
-          <button className="mobile-header-btn" onClick={toggleMenu}>
-            <Menu size={24} />
-          </button>
-        )}
-        
-        <h1 className="mobile-header-title">
-          {showModeCards ? 'MiniMind' : modes[currentMode]?.name || 'Chat'}
-        </h1>
-        
-        <div className="mobile-header-actions">
-          <button 
-            className="mobile-header-btn" 
-            onClick={toggleTheme}
-            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-          >
-            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-          </button>
-          
-          {!showModeCards && (
-            <button 
-              className="mobile-header-btn"
-              onClick={() => onSpeak(answers[currentMode] || '', currentMode)}
-              disabled={!answers[currentMode]}
-            >
-              <Volume2 size={20} />
-            </button>
-          )}
-        </div>
+        <button 
+          className="menu-button" 
+          onClick={toggleMenu}
+          aria-label="Open menu"
+        >
+          <Menu size={24} />
+        </button>
+        <h1 className="app-title">MiniMind</h1>
       </header>
 
       {/* Main Content */}
-      <main className="mobile-content">
-        <AnimatePresence mode="wait">
-          {showModeCards ? renderModeCards() : renderChat()}
-        </AnimatePresence>
+      <main className="mobile-content" ref={contentRef}>
+        {/* Always show mode cards */}
+        <div className="mode-selection">
+          {renderModeCards()}
+        </div>
+        
+        {/* Show all mode responses */}
+        <div className="mode-responses">
+          {renderModeResponses()}
+        </div>
       </main>
 
       {/* Input Area */}
-      <div className="mobile-input-container">
+      <div className="input-container">
+        <div className="input-wrapper">
+          <button 
+            className="mic-button"
+            onClick={() => {}}
+            aria-label="Voice input"
+          >
+            <Mic size={20} />
+          </button>
+          <input
+            ref={inputRef}
+            type="text"
+            className="input-field"
+            placeholder={`Ask me anything in ${modes[currentMode]?.name || 'Beginner'} mode...`}
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onFocus={() => setIsInputFocused(true)}
+            onBlur={() => setIsInputFocused(false)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+            aria-label="Type your question"
+          />
+        </div>
         <button 
-          className="mobile-input-btn secondary"
-          onClick={() => onSpeak('', currentMode)}
-        >
-          <Mic size={20} />
-        </button>
-        
-        <input
-          ref={inputRef}
-          type="text"
-          className="mobile-input"
-          placeholder={`Ask ${modes[currentMode]?.name || 'MiniMind'}...`}
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          onFocus={() => setIsInputFocused(true)}
-          onBlur={() => setIsInputFocused(false)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-        />
-        
-        <button 
-          className="mobile-input-btn"
+          className={`send-button ${!question.trim() ? 'disabled' : ''}`}
           onClick={handleSend}
           disabled={!question.trim()}
-          style={{ opacity: question.trim() ? 1 : 0.5 }}
+          aria-label="Send message"
         >
           <Send size={20} />
         </button>
@@ -273,71 +256,89 @@ const MobileApp = ({
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div 
-            className="mobile-menu-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={toggleMenu}
-          >
+          <>
+            <motion.div 
+              className="mobile-menu-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={toggleMenu}
+            />
             <motion.div 
               className="mobile-menu"
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
-              transition={{ type: 'tween' }}
-              onClick={(e) => e.stopPropagation()}
+              transition={{ type: 'tween', duration: 0.3 }}
             >
-              <div className="mobile-menu-header">
-                <h3>Menu</h3>
-                <button className="mobile-menu-close" onClick={toggleMenu}>
-                  <X size={24} />
-                </button>
+              <div className="menu-content">
+                <div className="menu-header">
+                  <h2 className="menu-title">Menu</h2>
+                  <button 
+                    className="menu-close" 
+                    onClick={toggleMenu}
+                    aria-label="Close menu"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+                
+                <div className="menu-section">
+                  <button 
+                    className="menu-item" 
+                    onClick={() => {
+                      onShowHistory();
+                      toggleMenu();
+                    }}
+                  >
+                    <div className="menu-icon"><History size={20} /></div>
+                    <span className="menu-item-text">History</span>
+                  </button>
+                  <button 
+                    className="menu-item" 
+                    onClick={() => {
+                      onShowLanguages();
+                      toggleMenu();
+                    }}
+                  >
+                    <div className="menu-icon"><Languages size={20} /></div>
+                    <span className="menu-item-text">Languages</span>
+                  </button>
+                  <button 
+                    className="menu-item" 
+                    onClick={() => {
+                      onShowSettings();
+                      toggleMenu();
+                    }}
+                  >
+                    <div className="menu-icon"><Settings size={20} /></div>
+                    <span className="menu-item-text">Settings</span>
+                  </button>
+                  <button 
+                    className="menu-item" 
+                    onClick={() => {
+                      toggleTheme();
+                      toggleMenu();
+                    }}
+                  >
+                    <div className="menu-icon">
+                      {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                    </div>
+                    <span className="menu-item-text">
+                      {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                    </span>
+                  </button>
+                </div>
               </div>
               
-              <nav className="mobile-nav">
-                <button 
-                  className="mobile-nav-item"
-                  onClick={() => {
-                    onShowHistory();
-                    toggleMenu();
-                  }}
-                >
-                  <History size={20} />
-                  <span>History</span>
-                </button>
-                
-                <button 
-                  className="mobile-nav-item"
-                  onClick={() => {
-                    onShowSettings();
-                    toggleMenu();
-                  }}
-                >
-                  <Settings size={20} />
-                  <span>Settings</span>
-                </button>
-                
-                <button 
-                  className="mobile-nav-item"
-                  onClick={() => {
-                    onShowLanguages();
-                    toggleMenu();
-                  }}
-                >
-                  <Languages size={20} />
-                  <span>Languages</span>
-                </button>
-                
-                <div className="mobile-nav-divider"></div>
-                
-                <div className="mobile-nav-footer">
-                  <p>MiniMind v2.3</p>
-                  <p>© {new Date().getFullYear()} MiniMind AI</p>
-                </div>
-              </nav>
+              <div className="mobile-nav-divider"></div>
+              
+              <div className="mobile-nav-footer">
+                <p>MiniMind v2.3</p>
+                <p>© {new Date().getFullYear()} MiniMind AI</p>
+              </div>
             </motion.div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>
