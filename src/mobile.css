@@ -1,7 +1,8 @@
 /* Mobile-First CSS Fixes for MiniMind */
 
 /* 1. Base Container and Body Fixes */
-html, body {
+html,
+body {
   width: 100%;
   max-width: 100%;
   margin: 0;
@@ -23,30 +24,41 @@ html, body {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: var(--header-bg, #ffffff);
+  background: var(--bg-surface);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   box-sizing: border-box;
   margin: 0;
   border: none;
+  gap: 8px;
+  /* Add gap to prevent touching */
 }
 
 .header-bar-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  position: static;
+  /* Remove absolute positioning */
+  transform: none;
   text-align: center;
-  flex-grow: 1;
+  flex: 1;
+  /* Allow it to take available space */
   margin: 0;
   padding: 0;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  /* Prevent spillover */
+  white-space: nowrap;
 }
 
 .header-logo-text {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text-primary, #1a1a1a);
+  color: var(--text-primary);
+  /* Use theme text color */
   margin: 0;
   padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 3. Mobile Navigation Toggle */
@@ -110,8 +122,10 @@ html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  padding-top: 60px; /* Space for fixed header */
-  padding-bottom: 80px; /* Space for bottom navigation */
+  padding-top: 60px;
+  /* Space for fixed header */
+  padding-bottom: 80px;
+  /* Space for bottom navigation */
   min-height: 100vh;
   box-sizing: border-box;
 }
@@ -123,12 +137,16 @@ html, body {
 }
 
 /* 7. Input and Form Elements */
-input, textarea, button, select {
+input,
+textarea,
+button,
+select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
   border-radius: 0;
-  font-size: 16px; /* Prevents iOS zoom on focus */
+  font-size: 16px;
+  /* Prevents iOS zoom on focus */
   touch-action: manipulation;
 }
 
@@ -140,7 +158,7 @@ input, textarea, button, select {
     padding-left: max(16px, env(safe-area-inset-left));
     padding-right: max(16px, env(safe-area-inset-right));
   }
-  
+
   .main-content {
     padding-left: max(16px, env(safe-area-inset-left));
     padding-right: max(16px, env(safe-area-inset-right));
@@ -174,7 +192,10 @@ body {
 
 /* 12. Fix for iOS input zoom */
 @media screen and (-webkit-min-device-pixel-ratio: 0) and (max-device-width: 1024px) {
-  input, select, textarea {
+
+  input,
+  select,
+  textarea {
     font-size: 16px !important;
   }
 }
@@ -184,7 +205,7 @@ body {
   .desktop-only {
     display: none !important;
   }
-  
+
   .mobile-nav-toggle {
     display: flex !important;
   }
@@ -197,13 +218,18 @@ html {
 }
 
 /* 15. Fix for Android Chrome address bar */
-html, body {
+html,
+body {
   height: 100%;
   height: -webkit-fill-available;
 }
 
 /* 16. Disable text selection on interactive elements */
-button, a, input, textarea, select {
+button,
+a,
+input,
+textarea,
+select {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -211,7 +237,10 @@ button, a, input, textarea, select {
 }
 
 /* 17. Improve touch feedback */
-button, a, [role="button"], [role="tab"] {
+button,
+a,
+[role="button"],
+[role="tab"] {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
 }
 
@@ -243,4 +272,231 @@ textarea {
   backface-visibility: hidden;
   -webkit-perspective: 1000;
   perspective: 1000;
+}
+
+/* 21. Specific Page Fixes for Mobile Strict Single Column & Normalization */
+@media (max-width: 768px) {
+
+  /* Common Page Padding & Layout */
+  .page {
+    padding: 16px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .page-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 1.75rem !important;
+  }
+
+  /* Progress Page */
+  .progress-stats {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .badges-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .mode-distribution,
+  .timeline-section,
+  .badges-section {
+    padding: 16px !important;
+  }
+
+  .distribution-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .bar-label {
+    text-align: left !important;
+    margin-top: 4px;
+    width: 100%;
+  }
+
+  /* Ek Akshar Page */
+  .oneword-input-section {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .oneword-input {
+    width: 100% !important;
+  }
+
+  .oneword-btn {
+    width: 100% !important;
+    justify-content: center;
+    margin-left: 0 !important;
+  }
+
+  .example-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .oneword-controls {
+    justify-content: center !important;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .oneword-controls button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* History Page */
+  .history-controls {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .history-search-container {
+    width: 100% !important;
+  }
+
+  .history-search-input {
+    width: 100% !important;
+  }
+
+  .history-filters {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100%;
+    gap: 12px !important;
+  }
+
+  .filter-select {
+    width: 100% !important;
+  }
+
+  .clear-filters-btn {
+    width: 100% !important;
+  }
+
+  .history-actions {
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100%;
+  }
+
+  .history-actions button {
+    width: 100%;
+    justify-content: center;
+    margin: 0 !important;
+  }
+
+  .history-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  .history-info {
+    flex-wrap: wrap;
+  }
+
+  .history-entry-actions {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .history-entry-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* About Us Page */
+  .team-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  .team-member {
+    padding: 24px 16px !important;
+  }
+
+  /* FAQ Page */
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .faq-item {
+    padding: 20px 16px !important;
+  }
+
+  /* Language Page */
+  .language-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .language-option {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* Settings Page */
+  .settings-grid {
+    gap: 24px !important;
+  }
+
+  .setting-group {
+    padding: 20px 16px !important;
+  }
+
+  .setting-item {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 12px !important;
+  }
+
+  .setting-info {
+    text-align: center !important;
+    margin-bottom: 8px;
+  }
+
+  .theme-selector {
+    justify-content: center !important;
+    width: 100%;
+    display: flex;
+  }
+
+  .theme-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .setting-select {
+    width: 100% !important;
+  }
+
+  .toggle-btn {
+    margin: 0 auto;
+    /* Center toggle button */
+  }
+
+  /* Center all page headers content */
+  .page-header-content {
+    text-align: center !important;
+    padding: 0 8px;
+  }
+
+  .page-header-content h2 {
+    font-size: 1.75rem !important;
+  }
 }

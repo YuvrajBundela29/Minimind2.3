@@ -1,0 +1,112 @@
+/* =========================================
+   DARK MODE COLOR RESTORATION FIXES
+   ========================================= */
+
+/* 1. Global Dark Mode Fixes */
+[data-theme="dark"] .app,
+[data-theme="dark"] body {
+    background-color: #000000;
+    background-image: radial-gradient(circle at 50% 0%, #111111 0%, #000000 100%);
+}
+
+/* 2. Remove White Backgrounds from Capsules */
+[data-theme="dark"] .capsule {
+    background: linear-gradient(145deg, #111111 0%, #050505 100%);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Remove the white glare/shine in dark mode */
+[data-theme="dark"] .capsule::before {
+    background: none;
+    opacity: 0;
+}
+
+/* 3. Restore Deep Tinted Surfaces for Modes */
+
+/* Beginner - Deep Green Tint */
+[data-theme="dark"] .capsule.beginner {
+    background: linear-gradient(145deg, rgba(6, 78, 59, 0.15) 0%, rgba(0, 0, 0, 0.9) 100%);
+    border-color: rgba(5, 150, 105, 0.3);
+    box-shadow: 0 4px 20px rgba(6, 78, 59, 0.2);
+}
+
+[data-theme="dark"] .capsule.beginner:hover {
+    background: linear-gradient(145deg, rgba(6, 78, 59, 0.25) 0%, rgba(0, 0, 0, 0.9) 100%);
+    border-color: rgba(5, 150, 105, 0.5);
+    box-shadow: 0 8px 30px rgba(6, 78, 59, 0.3);
+}
+
+/* Thinker - Deep Purple Tint */
+[data-theme="dark"] .capsule.thinker {
+    background: linear-gradient(145deg, rgba(88, 28, 135, 0.15) 0%, rgba(0, 0, 0, 0.9) 100%);
+    border-color: rgba(124, 58, 237, 0.3);
+    box-shadow: 0 4px 20px rgba(88, 28, 135, 0.2);
+}
+
+[data-theme="dark"] .capsule.thinker:hover {
+    background: linear-gradient(145deg, rgba(88, 28, 135, 0.25) 0%, rgba(0, 0, 0, 0.9) 100%);
+    border-color: rgba(124, 58, 237, 0.5);
+    box-shadow: 0 8px 30px rgba(88, 28, 135, 0.3);
+}
+
+/* Story - Deep Orange/Amber Tint */
+[data-theme="dark"] .capsule.story {
+    background: linear-gradient(145deg, rgba(120, 53, 15, 0.15) 0%, rgba(0, 0, 0, 0.9) 100%);
+    border-color: rgba(217, 119, 6, 0.3);
+    box-shadow: 0 4px 20px rgba(120, 53, 15, 0.2);
+}
+
+[data-theme="dark"] .capsule.story:hover {
+    background: linear-gradient(145deg, rgba(120, 53, 15, 0.25) 0%, rgba(0, 0, 0, 0.9) 100%);
+    border-color: rgba(217, 119, 6, 0.5);
+    box-shadow: 0 8px 30px rgba(120, 53, 15, 0.3);
+}
+
+/* Mastery - Deep Blue Tint */
+[data-theme="dark"] .capsule.mastery {
+    background: linear-gradient(145deg, rgba(30, 58, 138, 0.15) 0%, rgba(0, 0, 0, 0.9) 100%);
+    border-color: rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 20px rgba(30, 58, 138, 0.2);
+}
+
+[data-theme="dark"] .capsule.mastery:hover {
+    background: linear-gradient(145deg, rgba(30, 58, 138, 0.25) 0%, rgba(0, 0, 0, 0.9) 100%);
+    border-color: rgba(37, 99, 235, 0.5);
+    box-shadow: 0 8px 30px rgba(30, 58, 138, 0.3);
+}
+
+/* 4. Fix Chat Bubbles & Containers in Dark Mode */
+[data-theme="dark"] .message.ai .message-content {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e5e5e5;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .message.user .message-content {
+    background: var(--brand-primary);
+    color: #ffffff;
+    border: none;
+}
+
+[data-theme="dark"] .prompt-capsule {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #a3a3a3;
+}
+
+[data-theme="dark"] .prompt-capsule:hover {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+    color: #ffffff;
+}
+
+/* Fix header and navigation elements */
+[data-theme="dark"] .header {
+    background: linear-gradient(180deg, #000000 0%, #111111 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .chat-input {
+    color: #ffffff;
+}

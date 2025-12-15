@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Send, 
-  Settings, 
-  Home, 
-  TrendingUp, 
-  GraduationCap, 
-  Globe, 
-  ArrowLeft, 
-  Volume2, 
+import {
+  Send,
+  Settings,
+  Home,
+  TrendingUp,
+  GraduationCap,
+  Globe,
+  ArrowLeft,
+  Volume2,
   Wand2,
   Menu,
   X,
@@ -59,7 +59,7 @@ const SpeechControls = ({ onSpeak, onPause, onResume, onStop, isSpeaking, isPaus
               title="Resume"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5v14l11-7z"/>
+                <path d="M8 5v14l11-7z" />
               </svg>
             </motion.button>
           ) : (
@@ -71,7 +71,7 @@ const SpeechControls = ({ onSpeak, onPause, onResume, onStop, isSpeaking, isPaus
               title="Pause"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
               </svg>
             </motion.button>
           )}
@@ -83,7 +83,7 @@ const SpeechControls = ({ onSpeak, onPause, onResume, onStop, isSpeaking, isPaus
             title="Stop"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
             </svg>
           </motion.button>
         </div>
@@ -232,9 +232,8 @@ const ModeSwitcher = ({ currentMode, onModeChange, enabledModes, answers, questi
       {Object.entries(modes).map(([modeKey, modeConfig]) => (
         <motion.button
           key={modeKey}
-          className={`mode-switch-btn ${
-            currentMode === modeKey ? 'active' : ''
-          } ${!enabledModes[modeKey] ? 'disabled' : ''}`}
+          className={`mode-switch-btn ${currentMode === modeKey ? 'active' : ''
+            } ${!enabledModes[modeKey] ? 'disabled' : ''}`}
           onClick={() => handleModeSwitch(modeKey)}
           disabled={!enabledModes[modeKey]}
           whileHover={{ scale: enabledModes[modeKey] ? 1.05 : 1 }}
@@ -244,7 +243,7 @@ const ModeSwitcher = ({ currentMode, onModeChange, enabledModes, answers, questi
           <span className="mode-icon">{modeConfig.icon}</span>
           <span className="mode-name">{modeConfig.name}</span>
           {answers && answers[modeKey] && (
-            <motion.div 
+            <motion.div
               className="answer-indicator"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -260,10 +259,10 @@ const ModeSwitcher = ({ currentMode, onModeChange, enabledModes, answers, questi
 // Mode filter dropdown
 const ModeFilter = ({ enabledModes, onToggleMode }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   return (
     <div className="mode-filter">
-      <button 
+      <button
         className="filter-toggle"
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -275,7 +274,7 @@ const ModeFilter = ({ enabledModes, onToggleMode }) => {
           ▼
         </motion.div>
       </button>
-      
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -314,7 +313,7 @@ function App() {
   const [translationSourceLanguage, setTranslationSourceLanguage] = useState('en');
   const [translationTargetLanguage, setTranslationTargetLanguage] = useState('hi');
   const [navExpanded, setNavExpanded] = useState(false);
-  const [question, setQuestion] = useState('');  
+  const [question, setQuestion] = useState('');
   const [answers, setAnswers] = useState({});
   const [fullscreenMode, setFullscreenMode] = useState(null);
   const [chatMessages, setChatMessages] = useState({});
@@ -366,7 +365,7 @@ function App() {
   const [historySortBy, setHistorySortBy] = useState('newest');
   // Suggested prompts for the hero section
   const [showSuggestedPrompts, setShowSuggestedPrompts] = useState(true);
-  
+
   // Generate random curiosity-testing prompts
   const generateRandomPrompts = () => {
     const promptSets = [
@@ -411,12 +410,12 @@ function App() {
         "What would happen if we discovered a new fundamental force of physics?"
       ]
     ];
-    
+
     // Get a random set of prompts
     const randomIndex = Math.floor(Math.random() * promptSets.length);
     return promptSets[randomIndex];
   };
-  
+
   const [suggestedPrompts, setSuggestedPrompts] = useState(() => generateRandomPrompts());
 
   // Function to generate dynamic prompts based on user input
@@ -436,7 +435,7 @@ function App() {
       ]);
     }
   };
-  
+
   const inputRef = useRef(null);
   const chatContainerRef = useRef(null);
 
@@ -446,7 +445,7 @@ function App() {
       if (typeof window !== 'undefined') {
         const isMobileView = window.innerWidth < 768;
         setIsMobile(isMobileView);
-        
+
         // Close mobile menu when resizing to desktop
         if (!isMobileView && isMobileNavOpen) {
           setIsMobileNavOpen(false);
@@ -456,19 +455,19 @@ function App() {
 
     // Initial check
     handleResize();
-    
+
     // Add viewport meta tag for mobile devices
     const viewportMeta = document.createElement('meta');
     viewportMeta.name = 'viewport';
     viewportMeta.content = 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover';
     document.head.appendChild(viewportMeta);
-    
+
     // Add touch event detection
     document.documentElement.classList.add('has-touch-events');
-    
+
     // Add event listener for window resize
     window.addEventListener('resize', handleResize);
-    
+
     // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -491,12 +490,12 @@ function App() {
     // Ensure we always work with a string to avoid runtime errors when
     // the AI returns structured content or unexpected types.
     let formatted = typeof answer === 'string' ? answer : String(answer);
-    
+
     // Remove hashtags and format as section headers
     formatted = formatted.replace(/###\s*(.*?)\n/g, '<h3 class="section-header">$1</h3>');
     formatted = formatted.replace(/##\s*(.*?)\n/g, '<h2 class="section-header">$1</h2>');
     formatted = formatted.replace(/#\s*(.*?)\n/g, '<h4 class="section-header">$1</h4>');
-    
+
     // Convert markdown-style bold (**text**) to HTML bold with primary highlight theme
     formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="highlight-text theme-bold">$1<\/strong>');
 
@@ -509,39 +508,39 @@ function App() {
 
     // Caret markers ^^text^^ for slightly larger, attention-grabbing text
     formatted = formatted.replace(/\^\^(.*?)\^\^/g, '<span class="large-text">$1<\/span>');
-    
+
     // Format numbered lists
     formatted = formatted.replace(/^(\d+\.)\s*(.*?)$/gm, '<div class="numbered-item"><span class="number">$1</span><span class="content">$2</span></div>');
-    
+
     // Format bullet points with different markers
     formatted = formatted.replace(/^[-•*]\s*(.*?)$/gm, '<div class="bullet-item"><span class="bullet">•<\/span><span class="content">$1<\/span><\/div>');
-    
+
     // Format mathematical formulas (LaTeX-like) with better handling
     // Handle incomplete formulas first
     formatted = formatted.replace(/\\\[([^\]]*?)(?:\\\]|$)/gs, '<div class="formula-block">$1</div>');
     formatted = formatted.replace(/\\\(([^\)]*?)(?:\\\)|$)/g, '<span class="formula-inline">$1</span>');
-    
+
     // Handle standard LaTeX formatting
     formatted = formatted.replace(/\\\[(.*?)\\\]/gs, '<div class="formula-block">$1</div>');
     formatted = formatted.replace(/\\\((.*?)\\\)/g, '<span class="formula-inline">$1</span>');
-    
+
     // Handle simple math expressions in square brackets
     formatted = formatted.replace(/\[(.*?)\]/g, '<span class="formula-inline">$1</span>');
-    
+
     // Format code blocks
     formatted = formatted.replace(/```(.*?)```/gs, '<pre class="code-block">$1</pre>');
     formatted = formatted.replace(/`(.*?)`/g, '<code class="inline-code">$1</code>');
-    
+
     // Convert colons after terms to create definition-style formatting
     formatted = formatted.replace(/^\s*([A-Za-z][^:]*?):\s*/gm, '<div class="definition-term">$1:</div>');
-    
+
     // Add proper line breaks and spacing
     formatted = formatted.replace(/\n\n/g, '<br><br>');
     formatted = formatted.replace(/\n/g, '<br>');
-    
+
     // Clean up extra spacing
     formatted = formatted.replace(/(<br>){3,}/g, '<br><br>');
-    
+
     return formatted;
   };
 
@@ -552,15 +551,15 @@ function App() {
     const savedSettings = JSON.parse(localStorage.getItem('minimind-settings') || '{}');
     const savedHistory = JSON.parse(localStorage.getItem('minimind-history') || '[]');
     const savedCasualMode = localStorage.getItem('minimind-casual-mode') === 'true';
-    
+
     setTheme(savedTheme);
     setSettings(prev => ({ ...prev, ...savedSettings }));
     setHistory(savedHistory);
     setCasualMode(savedCasualMode);
-    
+
     document.documentElement.setAttribute('data-theme', savedTheme);
-    document.documentElement.style.fontSize = savedSettings.fontSize === 'small' ? '14px' : 
-                                              savedSettings.fontSize === 'large' ? '18px' : '16px';
+    document.documentElement.style.fontSize = savedSettings.fontSize === 'small' ? '14px' :
+      savedSettings.fontSize === 'large' ? '18px' : '16px';
   }, []);
 
   const toggleTheme = () => {
@@ -574,11 +573,11 @@ function App() {
     const updatedSettings = { ...settings, ...newSettings };
     setSettings(updatedSettings);
     localStorage.setItem('minimind-settings', JSON.stringify(updatedSettings));
-    
+
     // Apply font size changes
     if (newSettings.fontSize) {
-      document.documentElement.style.fontSize = newSettings.fontSize === 'small' ? '14px' : 
-                                                newSettings.fontSize === 'large' ? '18px' : '16px';
+      document.documentElement.style.fontSize = newSettings.fontSize === 'small' ? '14px' :
+        newSettings.fontSize === 'large' ? '18px' : '16px';
     }
   };
 
@@ -611,10 +610,10 @@ function App() {
   // Enhanced question input handler with real-time transliteration (GBoard-like)
   const handleQuestionChange = (e) => {
     const inputValue = e.target.value;
-    
+
     // Apply transliteration if enabled and in typing translator mode
     let processedValue = inputValue;
-    
+
     // Check if typing translator is enabled (real-time conversion as user types)
     if (settings.typingTranslatorEnabled && languageTransliterationMap[selectedLanguage]) {
       try {
@@ -625,14 +624,14 @@ function App() {
       } catch (error) {
         console.error('Real-time transliteration error:', error);
       }
-    } 
+    }
     // Otherwise use the existing transliteration logic
     else if (settings.transliterationEnabled && settings.scriptPreference === 'native') {
       processedValue = handleTransliteration(inputValue);
     }
-    
+
     setQuestion(processedValue);
-    
+
     // Generate dynamic prompts based on user input (with debounce)
     if (inputValue.trim().length > 3) {
       clearTimeout(window.promptDebounce);
@@ -665,7 +664,7 @@ function App() {
       time: new Date(timestamp).toLocaleTimeString(),
       pinned: false,
     };
-    
+
     const updatedHistory = [historyEntry, ...history.slice(0, 49)]; // Keep last 50 entries
     setHistory(updatedHistory);
     localStorage.setItem('minimind-history', JSON.stringify(updatedHistory));
@@ -681,7 +680,7 @@ function App() {
     const id = Date.now();
     const notification = { id, message, type };
     setNotifications(prev => [...prev, notification]);
-    
+
     // Auto remove after 5 seconds
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id));
@@ -700,19 +699,19 @@ function App() {
       console.log('Casual Mode:', casualMode);
       console.log('Selected Language:', selectedLanguage);
       console.log('Language Config:', languages[selectedLanguage]);
-      
-      const effectiveLanguage = casualMode && languages[selectedLanguage]?.casual ? 
+
+      const effectiveLanguage = casualMode && languages[selectedLanguage]?.casual ?
         `${selectedLanguage}_casual` : selectedLanguage;
-      
+
       console.log('Effective Language:', effectiveLanguage);
-      
+
       if (isRefinement) {
         return await AIService.refinePrompt(prompt, effectiveLanguage);
       }
-      
+
       // Get the AI response
       let response = await AIService.getExplanation(prompt, mode, effectiveLanguage);
-      
+
       // Translate if auto-translation is enabled and language is not English
       if (settings.autoTranslation && selectedLanguage !== 'en') {
         try {
@@ -725,7 +724,7 @@ function App() {
           // Continue with original response if translation fails
         }
       }
-      
+
       return response;
     } catch (error) {
       console.error('Error getting AI response:', error);
@@ -745,9 +744,9 @@ function App() {
     setIsAnswering(true);
     setAnswers({});
     setLoadingModes({});
-    
+
     const timestamp = Date.now();
-    
+
     // Get answers for all modes simultaneously
     const modeKeys = Object.keys(modes).filter(key => enabledModes[key]);
     const promises = modeKeys.map(async (modeKey) => {
@@ -765,7 +764,7 @@ function App() {
         } else {
           addNotification(`Failed to get ${modes[modeKey].name} explanation: ${error.message}`, 'error');
         }
-        const errorMessage = error.message.includes('Payment required') 
+        const errorMessage = error.message.includes('Payment required')
           ? 'Payment required for AI service. Please check your OpenRouter account and billing information.'
           : 'Sorry, I encountered an error. Please try again.';
         setAnswers(prev => ({ ...prev, [modeKey]: errorMessage }));
@@ -773,7 +772,7 @@ function App() {
         return { [modeKey]: errorMessage };
       }
     });
-    
+
     // Wait for all responses and save to history
     const results = await Promise.allSettled(promises);
     const allAnswers = {};
@@ -782,11 +781,11 @@ function App() {
         Object.assign(allAnswers, result.value);
       }
     });
-    
+
     // Save to history
     saveToHistory(question, allAnswers, timestamp);
     setIsAnswering(false);
-    
+
     // Reset dynamic prompts after submission
     setSuggestedPrompts(generateRandomPrompts());
     // Show suggested prompts again after submission
@@ -796,7 +795,7 @@ function App() {
   // Handle prompt refinement
   const handleRefinePrompt = async () => {
     if (!question.trim()) return;
-    
+
     setIsRefining(true);
     setShowRefinedPrompt(true);
     try {
@@ -827,7 +826,7 @@ function App() {
   const handleOnewordSubmit = async (e) => {
     e.preventDefault();
     if (!onewordInput.trim()) return;
-    
+
     setIsOnewordLoading(true);
     try {
       const response = await AIService.getOneWordAnswer(onewordInput, selectedLanguage);
@@ -853,32 +852,32 @@ function App() {
 
     // Always operate on a string to avoid .replace on non-string values
     let cleanText = typeof text === 'string' ? text : String(text);
-    
+
     // Remove HTML tags
     cleanText = cleanText.replace(/<[^>]*>/g, ' ');
-    
+
     // Remove markdown formatting
     cleanText = cleanText.replace(/\*\*(.*?)\*\*/g, '$1'); // Bold
     cleanText = cleanText.replace(/\*(.*?)\*/g, '$1'); // Italic
     cleanText = cleanText.replace(/`(.*?)`/g, '$1'); // Code
     cleanText = cleanText.replace(/```[\s\S]*?```/g, ''); // Code blocks
-    
+
     // Remove hashtags
     cleanText = cleanText.replace(/#+ /g, '');
     cleanText = cleanText.replace(/#/g, '');
-    
+
     // Remove emojis
     cleanText = cleanText.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
-    
+
     // Remove special characters and extra spaces
     cleanText = cleanText.replace(/[\*\-\+\=\|\[\]\(\)]/g, ' ');
     cleanText = cleanText.replace(/\s+/g, ' ');
     cleanText = cleanText.trim();
-    
+
     // Add natural pauses at periods and commas
     cleanText = cleanText.replace(/\./g, '.');
     cleanText = cleanText.replace(/,/g, ', ');
-    
+
     return cleanText;
   };
 
@@ -913,7 +912,7 @@ function App() {
 ${content}
 
 Shared from MiniMind AI`;
-    
+
     // Try modern clipboard API first
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(textToCopy).then(() => {
@@ -939,7 +938,7 @@ Shared from MiniMind AI`;
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
-    
+
     try {
       const successful = document.execCommand('copy');
       if (successful) {
@@ -951,7 +950,7 @@ Shared from MiniMind AI`;
       console.error('Legacy copy failed:', error);
       addNotification('Failed to copy to clipboard', 'error');
     }
-    
+
     document.body.removeChild(textArea);
   };
 
@@ -960,15 +959,15 @@ Shared from MiniMind AI`;
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
-      
+
       // Configure recognition
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
-      
+
       // Set language for recognition based on selected language and casual mode
       let recognitionLanguage = 'en-US';
-      
+
       if (selectedLanguage === 'en') {
         recognitionLanguage = 'en-US';
       } else if (selectedLanguage === 'hi') {
@@ -1025,23 +1024,23 @@ Shared from MiniMind AI`;
         // For other languages, try to map or fallback to English
         recognitionLanguage = `${selectedLanguage}-${selectedLanguage.toUpperCase()}`;
       }
-      
+
       recognition.lang = recognitionLanguage;
-      
+
       recognition.onstart = () => {
         addNotification(`🎤 Listening in ${languages[selectedLanguage]?.name || 'selected language'}... Speak now!`, 'success');
       };
-      
+
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         setQuestion(transcript);
         addNotification('✅ Voice input captured!', 'success');
       };
-      
+
       recognition.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
         let errorMessage = `❌ Voice input error: ${event.error}`;
-        
+
         // Provide specific error messages
         if (event.error === 'no-speech') {
           errorMessage = '❌ No speech detected. Please try again and speak clearly.';
@@ -1054,14 +1053,14 @@ Shared from MiniMind AI`;
         } else if (event.error === 'language-not-supported') {
           errorMessage = `❌ Language ${languages[selectedLanguage]?.name || selectedLanguage} not supported for voice input. Try switching to English or Hindi.`;
         }
-        
+
         addNotification(errorMessage, 'error');
       };
-      
+
       recognition.onend = () => {
         addNotification('🎤 Voice input ended', 'info');
       };
-      
+
       try {
         recognition.start();
       } catch (error) {
@@ -1123,180 +1122,180 @@ Shared from MiniMind AI`;
       console.log('🎤 handleSpeak called with text length:', cleanText.length, 'mode:', mode);
 
       const utterance = new SpeechSynthesisUtterance(cleanText);
-    setCurrentSpeech(utterance);
-    setIsSpeaking(true);
-    setSpeechPaused(false);
-    
-    // Wait for voices to load if not already loaded
-    const speakWithVoice = () => {
-      const voices = speechSynthesis.getVoices();
-      
-      // Enhanced language mapping for ultra-realistic voices
-      const languageVoiceMap = {
-        'en': ['en-US', 'en-GB', 'en-AU', 'en-CA', 'en-IN', 'en-NZ', 'en-ZA'],
-        'hi': ['hi-IN', 'hi'],
-        'ur': ['ur-PK', 'ur-IN', 'ur'],
-        'ta': ['ta-IN', 'ta-LK', 'ta-SG', 'ta'],
-        'ml': ['ml-IN', 'ml'],
-        'bn': ['bn-IN', 'bn-BD', 'bn'],
-        'pa': ['pa-IN', 'pa-PK', 'pa'],
-        'gu': ['gu-IN', 'gu'],
-        'kn': ['kn-IN', 'kn'],
-        'te': ['te-IN', 'te'],
-        'or': ['or-IN', 'or'],
-        'as': ['as-IN', 'as'],
-        'ne': ['ne-NP', 'ne-IN', 'ne'],
-        'mr': ['mr-IN', 'mr'],
-        'sa': ['sa-IN', 'sa'],
-        'sd': ['sd-IN', 'sd-PK', 'sd'],
-        'ks': ['ks-IN', 'ks'],
-        'bod': ['bod-IN', 'bod'],
-        'hinglish': ['hi-IN', 'en-IN', 'hi', 'en-US']
-      };
-      
-      // Ultra-realistic mode-specific voice characteristics
-      const voiceSettings = {
-        beginner: { rate: 0.8, pitch: 1.1, volume: 0.9 }, // Slower, friendly, higher pitch
-        thinker: { rate: 0.9, pitch: 0.95, volume: 0.85 }, // Natural pace, slightly lower pitch
-        story: { rate: 0.85, pitch: 1.05, volume: 0.9 }, // Storytelling pace, expressive
-        mastery: { rate: 0.95, pitch: 0.9, volume: 0.85 }, // Professional, confident
-        oneword: { rate: 0.75, pitch: 1.15, volume: 0.9 } // Clear and precise
-      };
-      
-      const settings = voiceSettings[mode] || voiceSettings.beginner;
-      utterance.rate = settings.rate;
-      utterance.pitch = settings.pitch;
-      utterance.volume = settings.volume;
-      
-      // Get preferred languages for current selection
-      const voiceLangs = languageVoiceMap[selectedLanguage] || ['en-US'];
-      utterance.lang = voiceLangs[0];
-      
-      // Advanced voice selection algorithm for ultra-realistic voices
-      const findUltraRealisticVoice = () => {
-        const voicePreferences = [
-          // Priority 1: Neural/AI voices (most realistic)
-          (v) => v.name.toLowerCase().includes('neural') || 
-                 v.name.toLowerCase().includes('enhanced') ||
-                 v.name.toLowerCase().includes('premium') ||
-                 v.name.toLowerCase().includes('wavenet') ||
-                 v.name.toLowerCase().includes('studio'),
-          
-          // Priority 2: System voices (usually high quality)
-          (v) => v.localService && !v.name.toLowerCase().includes('google'),
-          
-          // Priority 3: Platform-specific quality voices
-          (v) => v.name.toLowerCase().includes('siri') ||
-                 v.name.toLowerCase().includes('cortana') ||
-                 v.name.toLowerCase().includes('alexa') ||
-                 v.name.toLowerCase().includes('samantha') ||
-                 v.name.toLowerCase().includes('alex'),
-          
-          // Priority 4: Any native voice for the language
-          (v) => v.localService,
-          
-          // Priority 5: Any voice for the language
-          (v) => true
-        ];
-        
-        for (const lang of voiceLangs) {
-          const langCode = lang.split('-')[0];
-          const languageVoices = voices.filter(v => 
-            v.lang.toLowerCase().startsWith(langCode.toLowerCase()) ||
-            v.lang.toLowerCase() === lang.toLowerCase()
-          );
-          
-          for (const preference of voicePreferences) {
-            const matchingVoices = languageVoices.filter(preference);
-            if (matchingVoices.length > 0) {
-              // Prefer female voices for beginner mode, male for mastery
-              if (mode === 'beginner') {
-                const femaleVoices = matchingVoices.filter(v => 
-                  v.name.toLowerCase().includes('female') ||
-                  v.name.toLowerCase().includes('woman') ||
-                  ['samantha', 'alex', 'victoria', 'zira', 'helena', 'susan', 'karen'].some(name => 
-                    v.name.toLowerCase().includes(name.toLowerCase())
-                  )
-                );
-                if (femaleVoices.length > 0) return femaleVoices[0];
+      setCurrentSpeech(utterance);
+      setIsSpeaking(true);
+      setSpeechPaused(false);
+
+      // Wait for voices to load if not already loaded
+      const speakWithVoice = () => {
+        const voices = speechSynthesis.getVoices();
+
+        // Enhanced language mapping for ultra-realistic voices
+        const languageVoiceMap = {
+          'en': ['en-US', 'en-GB', 'en-AU', 'en-CA', 'en-IN', 'en-NZ', 'en-ZA'],
+          'hi': ['hi-IN', 'hi'],
+          'ur': ['ur-PK', 'ur-IN', 'ur'],
+          'ta': ['ta-IN', 'ta-LK', 'ta-SG', 'ta'],
+          'ml': ['ml-IN', 'ml'],
+          'bn': ['bn-IN', 'bn-BD', 'bn'],
+          'pa': ['pa-IN', 'pa-PK', 'pa'],
+          'gu': ['gu-IN', 'gu'],
+          'kn': ['kn-IN', 'kn'],
+          'te': ['te-IN', 'te'],
+          'or': ['or-IN', 'or'],
+          'as': ['as-IN', 'as'],
+          'ne': ['ne-NP', 'ne-IN', 'ne'],
+          'mr': ['mr-IN', 'mr'],
+          'sa': ['sa-IN', 'sa'],
+          'sd': ['sd-IN', 'sd-PK', 'sd'],
+          'ks': ['ks-IN', 'ks'],
+          'bod': ['bod-IN', 'bod'],
+          'hinglish': ['hi-IN', 'en-IN', 'hi', 'en-US']
+        };
+
+        // Ultra-realistic mode-specific voice characteristics
+        const voiceSettings = {
+          beginner: { rate: 0.8, pitch: 1.1, volume: 0.9 }, // Slower, friendly, higher pitch
+          thinker: { rate: 0.9, pitch: 0.95, volume: 0.85 }, // Natural pace, slightly lower pitch
+          story: { rate: 0.85, pitch: 1.05, volume: 0.9 }, // Storytelling pace, expressive
+          mastery: { rate: 0.95, pitch: 0.9, volume: 0.85 }, // Professional, confident
+          oneword: { rate: 0.75, pitch: 1.15, volume: 0.9 } // Clear and precise
+        };
+
+        const settings = voiceSettings[mode] || voiceSettings.beginner;
+        utterance.rate = settings.rate;
+        utterance.pitch = settings.pitch;
+        utterance.volume = settings.volume;
+
+        // Get preferred languages for current selection
+        const voiceLangs = languageVoiceMap[selectedLanguage] || ['en-US'];
+        utterance.lang = voiceLangs[0];
+
+        // Advanced voice selection algorithm for ultra-realistic voices
+        const findUltraRealisticVoice = () => {
+          const voicePreferences = [
+            // Priority 1: Neural/AI voices (most realistic)
+            (v) => v.name.toLowerCase().includes('neural') ||
+              v.name.toLowerCase().includes('enhanced') ||
+              v.name.toLowerCase().includes('premium') ||
+              v.name.toLowerCase().includes('wavenet') ||
+              v.name.toLowerCase().includes('studio'),
+
+            // Priority 2: System voices (usually high quality)
+            (v) => v.localService && !v.name.toLowerCase().includes('google'),
+
+            // Priority 3: Platform-specific quality voices
+            (v) => v.name.toLowerCase().includes('siri') ||
+              v.name.toLowerCase().includes('cortana') ||
+              v.name.toLowerCase().includes('alexa') ||
+              v.name.toLowerCase().includes('samantha') ||
+              v.name.toLowerCase().includes('alex'),
+
+            // Priority 4: Any native voice for the language
+            (v) => v.localService,
+
+            // Priority 5: Any voice for the language
+            (v) => true
+          ];
+
+          for (const lang of voiceLangs) {
+            const langCode = lang.split('-')[0];
+            const languageVoices = voices.filter(v =>
+              v.lang.toLowerCase().startsWith(langCode.toLowerCase()) ||
+              v.lang.toLowerCase() === lang.toLowerCase()
+            );
+
+            for (const preference of voicePreferences) {
+              const matchingVoices = languageVoices.filter(preference);
+              if (matchingVoices.length > 0) {
+                // Prefer female voices for beginner mode, male for mastery
+                if (mode === 'beginner') {
+                  const femaleVoices = matchingVoices.filter(v =>
+                    v.name.toLowerCase().includes('female') ||
+                    v.name.toLowerCase().includes('woman') ||
+                    ['samantha', 'alex', 'victoria', 'zira', 'helena', 'susan', 'karen'].some(name =>
+                      v.name.toLowerCase().includes(name.toLowerCase())
+                    )
+                  );
+                  if (femaleVoices.length > 0) return femaleVoices[0];
+                }
+
+                if (mode === 'mastery') {
+                  const maleVoices = matchingVoices.filter(v =>
+                    v.name.toLowerCase().includes('male') ||
+                    v.name.toLowerCase().includes('man') ||
+                    ['david', 'mark', 'daniel', 'james', 'tom', 'fred'].some(name =>
+                      v.name.toLowerCase().includes(name.toLowerCase())
+                    )
+                  );
+                  if (maleVoices.length > 0) return maleVoices[0];
+                }
+
+                return matchingVoices[0];
               }
-              
-              if (mode === 'mastery') {
-                const maleVoices = matchingVoices.filter(v => 
-                  v.name.toLowerCase().includes('male') ||
-                  v.name.toLowerCase().includes('man') ||
-                  ['david', 'mark', 'daniel', 'james', 'tom', 'fred'].some(name => 
-                    v.name.toLowerCase().includes(name.toLowerCase())
-                  )
-                );
-                if (maleVoices.length > 0) return maleVoices[0];
-              }
-              
-              return matchingVoices[0];
             }
           }
+
+          return null;
+        };
+
+        const selectedVoice = findUltraRealisticVoice();
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+          console.log(`🎤 Ultra-realistic voice: ${selectedVoice.name} (${selectedVoice.lang}) - ${mode} mode`);
+        } else {
+          console.log(`🎤 Using default voice for ${mode} mode`);
         }
-        
-        return null;
+
+        // Enhanced event listeners
+        utterance.addEventListener('start', () => {
+          console.log(`🗣️ Speaking in ${mode} mode`);
+          setIsSpeaking(true);
+        });
+
+        utterance.addEventListener('end', () => {
+          console.log('🔇 Speech completed');
+          setIsSpeaking(false);
+          setSpeechPaused(false);
+          setCurrentSpeech(null);
+        });
+
+        utterance.addEventListener('error', (e) => {
+          console.error('🚫 Speech error:', e.error);
+          addNotification(`Speech error: ${e.error}`, 'error');
+          setIsSpeaking(false);
+          setSpeechPaused(false);
+          setCurrentSpeech(null);
+        });
+
+        utterance.addEventListener('pause', () => {
+          setSpeechPaused(true);
+        });
+
+        utterance.addEventListener('resume', () => {
+          setSpeechPaused(false);
+        });
+
+        // Speak with enhanced settings
+        speechSynthesis.speak(utterance);
       };
-      
-      const selectedVoice = findUltraRealisticVoice();
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-        console.log(`🎤 Ultra-realistic voice: ${selectedVoice.name} (${selectedVoice.lang}) - ${mode} mode`);
+
+      // Handle voice loading
+      if (speechSynthesis.getVoices().length === 0) {
+        speechSynthesis.addEventListener('voiceschanged', speakWithVoice, { once: true });
       } else {
-        console.log(`🎤 Using default voice for ${mode} mode`);
+        speakWithVoice();
       }
-      
-      // Enhanced event listeners
-      utterance.addEventListener('start', () => {
-        console.log(`🗣️ Speaking in ${mode} mode`);
-        setIsSpeaking(true);
-      });
-      
-      utterance.addEventListener('end', () => {
-        console.log('🔇 Speech completed');
-        setIsSpeaking(false);
-        setSpeechPaused(false);
-        setCurrentSpeech(null);
-      });
-      
-      utterance.addEventListener('error', (e) => {
-        console.error('🚫 Speech error:', e.error);
-        addNotification(`Speech error: ${e.error}`, 'error');
-        setIsSpeaking(false);
-        setSpeechPaused(false);
-        setCurrentSpeech(null);
-      });
-      
-      utterance.addEventListener('pause', () => {
-        setSpeechPaused(true);
-      });
-      
-      utterance.addEventListener('resume', () => {
-        setSpeechPaused(false);
-      });
-      
-      // Speak with enhanced settings
-      speechSynthesis.speak(utterance);
-    };
-    
-    // Handle voice loading
-    if (speechSynthesis.getVoices().length === 0) {
-      speechSynthesis.addEventListener('voiceschanged', speakWithVoice, { once: true });
-    } else {
-      speakWithVoice();
+    } catch (err) {
+      console.error('🚫 Unexpected speech error:', err);
+      addNotification('Speech could not be started. Please try again.', 'error');
     }
-  } catch (err) {
-    console.error('🚫 Unexpected speech error:', err);
-    addNotification('Speech could not be started. Please try again.', 'error');
-  }
   };
 
   // Enhanced fullscreen mode switching with answer loading
   const handleFullscreenModeChange = (newMode, existingAnswer, currentQuestion) => {
     setFullscreenMode(newMode);
-    
+
     // Initialize chat with existing answer if available
     if (existingAnswer && currentQuestion) {
       setChatMessages(prev => ({
@@ -1320,15 +1319,15 @@ Shared from MiniMind AI`;
       setShowSearchResults(false);
       return;
     }
-    
+
     // Search in history entries
-    const results = history.filter(entry => 
+    const results = history.filter(entry =>
       entry.question.toLowerCase().includes(term.toLowerCase()) ||
-      Object.values(entry.answers).some(answer => 
+      Object.values(entry.answers).some(answer =>
         answer && answer.toLowerCase().includes(term.toLowerCase())
       )
     );
-    
+
     setSearchResults(results);
     setShowSearchResults(true);
   };
@@ -1346,20 +1345,20 @@ Shared from MiniMind AI`;
   // Generate related topics function (using the unified Netlify-backed AI response)
   const generateRelatedTopics = async (currentQuestion) => {
     if (!currentQuestion.trim()) return [];
-    
+
     try {
       const prompt = `Based on the question "${currentQuestion}", provide 5 related topics or questions that would help deepen understanding of this subject. Format each as a concise question or topic. Number them 1-5.`;
 
       // Use the same AI pipeline (getAIResponse) so language & casual mode are respected
       const response = await getAIResponse(prompt, 'thinker');
-      
+
       // Parse the response to extract topics
       const topics = String(response || '')
         .split('\n')
         .filter(line => /^\d+\.\s*/.test(line))
         .map(line => line.replace(/^\d+\.\s*/, '').trim())
         .slice(0, 5);
-      
+
       return topics;
     } catch (error) {
       console.error('Error generating related topics:', error);
@@ -1373,10 +1372,10 @@ Shared from MiniMind AI`;
       addNotification('Please enter a question first', 'error');
       return;
     }
-    
+
     setIsGeneratingRelatedTopics(true);
     setShowContextualPanel(true);
-    
+
     try {
       const topics = await generateRelatedTopics(question);
       setRelatedTopics(topics);
@@ -1412,7 +1411,7 @@ Shared from MiniMind AI`;
     setQuestion(entry.question);
     setAnswers(entry.answers);
     setCurrentPage('home');
-    
+
     // Show notification
     addNotification('History entry loaded successfully!', 'success');
   };
@@ -1420,46 +1419,46 @@ Shared from MiniMind AI`;
   // Filter and sort history
   const filteredHistory = useMemo(() => {
     let filtered = history;
-    
+
     // Apply search filter
     if (historySearchTerm) {
       const term = historySearchTerm.toLowerCase();
-      filtered = filtered.filter(entry => 
+      filtered = filtered.filter(entry =>
         entry.question.toLowerCase().includes(term) ||
-        Object.values(entry.answers).some(answer => 
+        Object.values(entry.answers).some(answer =>
           answer.toLowerCase().includes(term)
         )
       );
     }
-    
+
     // Apply mode filter
     if (historyFilterMode) {
-      filtered = filtered.filter(entry => 
+      filtered = filtered.filter(entry =>
         entry.answers[historyFilterMode]
       );
     }
-    
+
     // Apply language filter
     if (historyFilterLanguage) {
-      filtered = filtered.filter(entry => 
+      filtered = filtered.filter(entry =>
         entry.language === historyFilterLanguage
       );
     }
-    
+
     // Apply sorting
     if (historySortBy === 'oldest') {
       filtered = [...filtered].sort((a, b) => a.timestamp - b.timestamp);
     } else {
       filtered = [...filtered].sort((a, b) => b.timestamp - a.timestamp);
     }
-    
+
     return filtered;
   }, [history, historySearchTerm, historyFilterMode, historyFilterLanguage, historySortBy]);
 
   // Pin/unpin history entry
   const pinHistoryEntry = (id) => {
     const entry = history.find(e => e.id === id);
-    const updatedHistory = history.map(e => 
+    const updatedHistory = history.map(e =>
       e.id === id ? { ...e, pinned: !e.pinned } : e
     );
     setHistory(updatedHistory);
@@ -1502,13 +1501,13 @@ Shared from MiniMind AI`;
   // Send message in chat
   const handleChatSubmit = async (e, mode) => {
     e.preventDefault();
-    
+
     // Check if current mode is enabled
     if (!enabledModes[mode]) {
       addNotification(`${modes[mode].name} mode is currently disabled. Please enable it in the mode filter.`);
       return;
     }
-    
+
     const input = e.target.elements.chatInput;
     const message = input.value.trim();
     if (!message) return;
@@ -1526,7 +1525,7 @@ Shared from MiniMind AI`;
       const currentMessages = chatMessages[mode] || [];
       const allMessages = [...currentMessages, { type: 'user', content: message }];
       const response = await AIService.continueConversation(allMessages, mode, selectedLanguage);
-      
+
       setChatMessages(prev => ({
         ...prev,
         [mode]: [...prev[mode], { type: 'ai', content: response }]
@@ -1612,7 +1611,7 @@ Shared from MiniMind AI`;
       </AnimatePresence>
 
       {/* Navigation Sidebar */}
-      <motion.div 
+      <motion.div
         className={`navigation ${navExpanded ? 'expanded' : ''}`}
         onMouseEnter={() => window.innerWidth > 768 && setNavExpanded(true)}
         onMouseLeave={() => window.innerWidth > 768 && setNavExpanded(false)}
@@ -1620,7 +1619,7 @@ Shared from MiniMind AI`;
         <div className="nav-content">
           {/* Logo */}
           <div className="nav-logo">
-            <motion.div 
+            <motion.div
               className="logo-icon"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
@@ -1641,9 +1640,9 @@ Shared from MiniMind AI`;
               )}
             </AnimatePresence>
           </div>
-          
+
           <div className="nav-divider"></div>
-          
+
           {navigationItems.map((item) => (
             <motion.button
               key={item.id}
@@ -1676,7 +1675,7 @@ Shared from MiniMind AI`;
         {currentPage === 'home' ? (
           <div className="home-page">
             {/* World-Class Hero Header */}
-            <motion.div 
+            <motion.div
               className="header"
               initial={{ opacity: 0, y: -50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1725,7 +1724,7 @@ Shared from MiniMind AI`;
                   </motion.button>
                 </div>
               </div>
-              
+
               <div className="hero-container">
                 <div className="hero-logo-container">
                   <img src="https://i.ibb.co/fGLH5Dxs/minimind-logo.png" className="hero-logo" />
@@ -1736,53 +1735,22 @@ Shared from MiniMind AI`;
             </motion.div>
 
             {/* World-Class Search Section */}
-            <motion.div 
+            <motion.div
               className="chat-section"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              
-              {/* Suggested Prompts */}
-              {Object.keys(answers).length === 0 && !isAnswering && showSuggestedPrompts && (
-                <motion.div 
-                  className="suggested-prompts"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  {suggestedPrompts.slice(0, 3).map((prompt, index) => (
-                    <motion.button
-                      key={index}
-                      className="prompt-capsule"
-                      onClick={() => setQuestion(prompt)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 + index * 0.1 }}
-                    >
-                      {prompt}
-                    </motion.button>
-                  ))}
-                  <motion.button
-                    className="toggle-prompts-btn"
-                    onClick={() => setShowSuggestedPrompts(false)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Hide Suggestions
-                  </motion.button>
-                </motion.div>
-              )}
-              
+
+              {/* Suggested Prompts removed */}
+
               <div className="chat-controls">
-                <ModeFilter 
+                <ModeFilter
                   enabledModes={enabledModes}
                   onToggleMode={toggleMode}
                 />
               </div>
-              
+
               <form onSubmit={handleSubmit} className="chat-form">
                 <div className="input-group">
                   <motion.button
@@ -1793,18 +1761,34 @@ Shared from MiniMind AI`;
                     whileTap={{ scale: 0.95 }}
                     title="Voice Input"
                   >
-                    <Mic size={16} />
+                    <Mic size={22} strokeWidth={2.5} />
                   </motion.button>
-                  
-                  <input
+
+                  <textarea
                     ref={inputRef}
-                    type="text"
                     value={question}
-                    onChange={handleQuestionChange}
-                    placeholder="Ask anything... MiniMind will explain in 4 different ways!"
+                    onChange={(e) => {
+                      handleQuestionChange(e);
+                      // Auto-resize logic
+                      e.target.style.height = 'auto';
+                      const scrollHeight = e.target.scrollHeight;
+                      e.target.style.height = `${Math.min(scrollHeight, 120)}px`;
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (question.trim()) {
+                          // Manually trigger submit
+                          const form = e.currentTarget.closest('form');
+                          if (form) form.requestSubmit();
+                        }
+                      }
+                    }}
+                    placeholder="Ask anything..."
                     className="chat-input"
+                    rows={1}
                   />
-                  
+
                   <motion.button
                     type="button"
                     onClick={handleRefinePrompt}
@@ -1817,31 +1801,12 @@ Shared from MiniMind AI`;
                     {isRefining ? (
                       <div className="mini-spinner" />
                     ) : (
-                      <Sparkles size={16} />
+                      <Sparkles size={22} strokeWidth={2.5} />
                     )}
                   </motion.button>
-                  
-                  <motion.button
-                    type="button"
-                    onClick={handleContextualLearning}
-                    className="contextual-btn"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    disabled={!question.trim() || isGeneratingRelatedTopics}
-                    title="Contextual Learning"
-                  >
-                    {isGeneratingRelatedTopics ? (
-                      <div className="mini-spinner" />
-                    ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        <path d="M2 8c0-2.2 1.8-4 4-4 2.2 0 4 1.8 4 4 0 2.2-1.8 4-4 4-2.2 0-4-1.8-4-4z"></path>
-                        <path d="M22 8c0-2.2-1.8-4-4-4-2.2 0-4 1.8-4 4 0 2.2 1.8 4 4 4 2.2 0 4-1.8 4-4z"></path>
-                      </svg>
-                    )}
-                  </motion.button>
-                  
+
+
+
                   <motion.button
                     type="submit"
                     className="send-btn"
@@ -1850,367 +1815,359 @@ Shared from MiniMind AI`;
                     disabled={!question.trim() || isAnswering}
                     title="Send"
                   >
-                    <Send size={16} />
+                    <Send size={22} strokeWidth={2.5} />
                   </motion.button>
                 </div>
               </form>
             </motion.div>
-              
-              {/* Contextual Learning Panel */}
-              <AnimatePresence>
-                {showContextualPanel && (
+
+            {/* Contextual Learning Panel */}
+            <AnimatePresence>
+              {showContextualPanel && (
+                <motion.div
+                  className="contextual-panel"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                >
+                  <div className="contextual-panel-header">
+                    <h3>Related Topics</h3>
+                    <button
+                      className="close-contextual-panel"
+                      onClick={() => setShowContextualPanel(false)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="contextual-topics">
+                    {relatedTopics.length > 0 ? (
+                      relatedTopics.map((topic, index) => (
+                        <motion.button
+                          key={index}
+                          className="contextual-topic"
+                          onClick={() => loadRelatedTopic(topic)}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          style={{ animationDelay: `${index * 0.1}s` }}
+                        >
+                          <span className="topic-number">{index + 1}.</span>
+                          <span className="topic-text">{topic}</span>
+                        </motion.button>
+                      ))
+                    ) : (
+                      <div className="no-topics">
+                        {isGeneratingRelatedTopics ? 'Generating related topics...' : 'No related topics found.'}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Refined Prompt Modal */}
+            <AnimatePresence>
+              {showRefinedPrompt && (
+                <motion.div
+                  className="modal-overlay"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setShowRefinedPrompt(false)}
+                >
                   <motion.div
-                    className="contextual-panel"
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
+                    className="refined-prompt-modal"
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="contextual-panel-header">
-                      <h3>Related Topics</h3>
-                      <button 
-                        className="close-contextual-panel"
-                        onClick={() => setShowContextualPanel(false)}
+                    <h3>Refined Question</h3>
+                    {isRefining ? (
+                      <div className="loading-text">
+                        <div className="typing-indicator">
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                        </div>
+                        <p>Refining your question...</p>
+                      </div>
+                    ) : (
+                      <p>{refinedPrompt}</p>
+                    )}
+                    <div className="modal-actions">
+                      <button
+                        onClick={() => {
+                          setQuestion(refinedPrompt);
+                          setShowRefinedPrompt(false);
+                        }}
+                        className="use-btn"
+                        disabled={isRefining}
                       >
-                        ✕
+                        Use This
+                      </button>
+                      <button
+                        onClick={() => setShowRefinedPrompt(false)}
+                        className="cancel-btn"
+                      >
+                        Cancel
                       </button>
                     </div>
-                    <div className="contextual-topics">
-                      {relatedTopics.length > 0 ? (
-                        relatedTopics.map((topic, index) => (
-                          <motion.button
-                            key={index}
-                            className="contextual-topic"
-                            onClick={() => loadRelatedTopic(topic)}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            style={{ animationDelay: `${index * 0.1}s` }}
-                          >
-                            <span className="topic-number">{index + 1}.</span>
-                            <span className="topic-text">{topic}</span>
-                          </motion.button>
-                        ))
-                      ) : (
-                        <div className="no-topics">
-                          {isGeneratingRelatedTopics ? 'Generating related topics...' : 'No related topics found.'}
-                        </div>
-                      )}
-                    </div>
                   </motion.div>
-                )}
-              </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-              {/* Refined Prompt Modal */}
-              <AnimatePresence>
-                {showRefinedPrompt && (
-                  <motion.div
-                    className="modal-overlay"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    onClick={() => setShowRefinedPrompt(false)}
-                  >
-                    <motion.div
-                      className="refined-prompt-modal"
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0.8, opacity: 0 }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <h3>Refined Question</h3>
-                      {isRefining ? (
-                        <div className="loading-text">
-                          <div className="typing-indicator">
-                            <span></span>
-                            <span></span>
-                            <span></span>
+            {/* Enhanced Answer Capsules - 2x2 Grid on desktop, accordion on mobile */}
+            <AnimatePresence>
+              {!fullscreenMode && (Object.keys(answers).length > 0 || isAnswering) && (
+                <motion.div
+                  className={`capsules-container ${isMobile ? 'mobile-accordion' : ''}`}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 50 }}
+                >
+                  {Object.entries(modes)
+                    .filter(([modeKey]) => enabledModes[modeKey])
+                    .map(([modeKey, modeConfig], index) => {
+                      const modeLabels = {
+                        beginner: 'Active',
+                        thinker: 'Logic',
+                        story: 'Narrative',
+                        mastery: 'Academic'
+                      };
+
+                      return (
+                        <motion.div
+                          key={modeKey}
+                          className={`capsule ${modeConfig.theme}`}
+                          whileHover={{ scale: 1.02 }}
+                          initial={{ opacity: 0, y: 50 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          <div
+                            className="capsule-header"
+                          >
+                            <span className="mode-icon">{modeConfig.icon}</span>
+                            <h3>{modeConfig.name}</h3>
+                            <span className="mode-tag">{modeLabels[modeKey]}</span>
                           </div>
-                          <p>Refining your question...</p>
-                        </div>
-                      ) : (
-                        <p>{refinedPrompt}</p>
-                      )}
-                      <div className="modal-actions">
-                        <button 
-                          onClick={() => {
-                            setQuestion(refinedPrompt);
-                            setShowRefinedPrompt(false);
-                          }}
-                          className="use-btn"
-                          disabled={isRefining}
-                        >
-                          Use This
-                        </button>
-                        <button 
-                          onClick={() => setShowRefinedPrompt(false)}
-                          className="cancel-btn"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Enhanced Answer Capsules - 2x2 Grid on desktop, accordion on mobile */}
-              <AnimatePresence>
-                {!fullscreenMode && (Object.keys(answers).length > 0 || isAnswering) && (
-                  <motion.div
-                    className={`capsules-container ${isMobile ? 'mobile-accordion' : ''}`}
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 50 }}
-                  >
-                    {Object.entries(modes)
-                      .filter(([modeKey]) => enabledModes[modeKey])
-                      .map(([modeKey, modeConfig], index) => {
-                        const modeLabels = {
-                          beginner: 'Active',
-                          thinker: 'Logic',
-                          story: 'Narrative',
-                          mastery: 'Academic'
-                        };
-                        
-                        const isActiveMobile = !isMobile || activeMobileMode === modeKey;
-
-                        return (
-                          <motion.div
-                            key={modeKey}
-                            className={`capsule ${modeConfig.theme} ${isMobile ? (isActiveMobile ? 'expanded' : 'collapsed') : ''}`}
-                            whileHover={{ scale: 1.02 }}
-                            initial={{ opacity: 0, y: 50 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                          >
-                            <div
-                              className="capsule-header"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (isMobile) {
-                                  setActiveMobileMode(prev => (prev === modeKey ? modeKey : modeKey));
-                                }
-                              }}
-                            >
-                              <span className="mode-icon">{modeConfig.icon}</span>
-                              <h3>{modeConfig.name}</h3>
-                              <span className="mode-tag">{modeLabels[modeKey]}</span>
-                            </div>
-                            <div className="capsule-content" onClick={(e) => e.stopPropagation()}>
-                              {loadingModes[modeKey] ? (
-                                <div className="typing-indicator">
-                                  <span></span>
-                                  <span></span>
-                                  <span></span>
-                                </div>
-                              ) : answers[modeKey] ? (
-                                <>
-                                  <div 
-                                    className="capsule-answer" 
-                                    dangerouslySetInnerHTML={{ 
-                                      __html: formatAnswer(answers[modeKey]) 
-                                    }} 
-                                  />
-                                  {answers[modeKey] && (
-                                    <div className="capsule-controls">
-                                      <SpeechControls
-                                        onSpeak={handleSpeak}
-                                        onPause={pauseSpeech}
-                                        onResume={resumeSpeech}
-                                        onStop={stopSpeech}
-                                        isSpeaking={isSpeaking}
-                                        isPaused={speechPaused}
-                                        text={answers[modeKey]}
-                                        mode={modeKey}
-                                      />
-                                      {!settings.autoTranslation && selectedLanguage !== 'en' && (
-                                        <button 
-                                          className="translate-btn"
-                                          onClick={async (e) => {
-                                            e.stopPropagation();
-                                            const translated = await handleManualTranslation(answers[modeKey], selectedLanguage);
-                                            setAnswers(prev => ({ ...prev, [modeKey]: translated }));
-                                          }}
-                                          title="Translate to selected language"
-                                        >
-                                          <Globe size={16} />
-                                        </button>
-                                      )}
-                                      {/* Translate this button for manual translation to any language */}
-                                      <button 
-                                        className="translate-btn"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setTranslationText(answers[modeKey]);
-                                          setTranslatedText('');
-                                          setTranslationSourceLanguage('en');
-                                          setTranslationTargetLanguage(selectedLanguage);
-                                          setIsTranslationModalOpen(true);
-                                        }}
-                                        title="Translate this answer to another language"
-                                      >
-                                        <Languages size={16} />
-                                      </button>
+                          <div className="capsule-content" onClick={(e) => e.stopPropagation()}>
+                            {loadingModes[modeKey] ? (
+                              <div className="typing-indicator">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                              </div>
+                            ) : answers[modeKey] ? (
+                              <>
+                                <div
+                                  className="capsule-answer"
+                                  dangerouslySetInnerHTML={{
+                                    __html: formatAnswer(answers[modeKey])
+                                  }}
+                                />
+                                {answers[modeKey] && (
+                                  <div className="capsule-controls">
+                                    <SpeechControls
+                                      onSpeak={handleSpeak}
+                                      onPause={pauseSpeech}
+                                      onResume={resumeSpeech}
+                                      onStop={stopSpeech}
+                                      isSpeaking={isSpeaking}
+                                      isPaused={speechPaused}
+                                      text={answers[modeKey]}
+                                      mode={modeKey}
+                                    />
+                                    {!settings.autoTranslation && selectedLanguage !== 'en' && (
                                       <button
-                                        className="fullscreen-btn"
-                                        onClick={(e) => {
+                                        className="translate-btn"
+                                        onClick={async (e) => {
                                           e.stopPropagation();
-                                          handleFullscreenModeChange(modeKey, answers[modeKey], question);
+                                          const translated = await handleManualTranslation(answers[modeKey], selectedLanguage);
+                                          setAnswers(prev => ({ ...prev, [modeKey]: translated }));
                                         }}
-                                        title="View fullscreen"
+                                        title="Translate to selected language"
                                       >
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-                                        </svg>
+                                        <Globe size={16} />
                                       </button>
-                                    </div>
-                                  )}
-                                  <div className="capsule-answer-controls">
+                                    )}
+                                    {/* Translate this button for manual translation to any language */}
                                     <button
-                                      className="expand-to-ekakshar-btn"
+                                      className="translate-btn"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        // Switch to Ekakshar mode
-                                        setCurrentPage('oneword');
-                                        // Set the question for Ekakshar
-                                        setOnewordInput(question);
-                                        // Get the Ekakshar answer
-                                        setTimeout(() => {
-                                          const getEkaksharAnswer = async () => {
-                                            try {
-                                              setIsOnewordLoading(true);
-                                              const response = await AIService.getOneWordAnswer(question, selectedLanguage);
-                                              setOnewordAnswer(response);
-                                              setIsOnewordLoading(false);
-                                            } catch (error) {
-                                              console.error('Ekakshar error:', error);
-                                              addNotification('Failed to get Ekakshar answer', 'error');
-                                              setIsOnewordLoading(false);
-                                            }
-                                          };
-                                          getEkaksharAnswer();
-                                        }, 100);
+                                        setTranslationText(answers[modeKey]);
+                                        setTranslatedText('');
+                                        setTranslationSourceLanguage('en');
+                                        setTranslationTargetLanguage(selectedLanguage);
+                                        setIsTranslationModalOpen(true);
                                       }}
+                                      title="Translate this answer to another language"
                                     >
-                                      <Wand2 size={16} /> Get One-Word Summary
+                                      <Languages size={16} />
                                     </button>
                                     <button
-                                      className="copy-btn"
+                                      className="fullscreen-btn"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        fallbackToClipboard(answers[modeKey], `${modeConfig.name} Answer`);
+                                        handleFullscreenModeChange(modeKey, answers[modeKey], question);
                                       }}
-                                      title="Copy answer to clipboard"
+                                      title="View fullscreen"
                                     >
-                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
                                       </svg>
                                     </button>
-                                    <button
-                                      className="download-btn"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        // Create a Blob with the content
-                                        const blob = new Blob([answers[modeKey]], { type: 'text/plain' });
-                                        const url = URL.createObjectURL(blob);
-                                        const a = document.createElement('a');
-                                        a.href = url;
-                                        a.download = `minimind-${modeKey}-answer-${Date.now()}.txt`;
-                                        document.body.appendChild(a);
-                                        a.click();
-                                        document.body.removeChild(a);
-                                        URL.revokeObjectURL(url);
-                                      }}
-                                      title="Download answer as text file"
-                                    >
-                                      <Download size={16} />
-                                    </button>
-                                    <button
-                                      className="share-btn"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        const shareData = {
-                                          title: `MiniMind ${modeConfig.name} Answer`,
-                                          text: answers[modeKey].substring(0, 100) + '...',
-                                          url: window.location.href
-                                        };
-                                        
-                                        if (navigator.share) {
-                                          navigator.share(shareData).catch((error) => {
-                                            console.error('Share failed:', error);
-                                            // Fallback to clipboard if share fails
-                                            fallbackToClipboard(answers[modeKey], `${modeConfig.name} Answer`);
-                                          });
-                                        } else {
-                                          // Fallback for browsers that don't support Web Share API
-                                          fallbackToClipboard(answers[modeKey], `${modeConfig.name} Answer`);
-                                        }
-                                      }}
-                                      title="Share answer"
-                                    >
-                                      <Share2 size={16} />
-                                    </button>
                                   </div>
-                                  {/* Chat input for capsule */}
-                                  <form 
-                                    onSubmit={(e) => {
-                                      e.preventDefault();
+                                )}
+                                <div className="capsule-answer-controls">
+                                  <button
+                                    className="expand-to-ekakshar-btn"
+                                    onClick={(e) => {
                                       e.stopPropagation();
-                                      const input = e.target.elements.capsuleInput;
-                                      const message = input.value.trim();
-                                      if (message) {
-                                        // Initialize chat for this mode if not exists
-                                        if (!chatMessages[modeKey]) {
-                                          setChatMessages(prev => ({
-                                            ...prev,
-                                            [modeKey]: [{ type: 'ai', content: answers[modeKey], timestamp: Date.now() }]
-                                          }));
-                                        }
-                                        handleFullscreenModeChange(modeKey, answers[modeKey], question);
-                                        // Add user message to chat after entering fullscreen
-                                        setTimeout(() => {
-                                          setChatMessages(prev => ({
-                                            ...prev,
-                                            [modeKey]: [...(prev[modeKey] || []), { type: 'user', content: message }]
-                                          }));
-                                        }, 100);
-                                        input.value = '';
+                                      // Switch to Ekakshar mode
+                                      setCurrentPage('oneword');
+                                      // Set the question for Ekakshar
+                                      setOnewordInput(question);
+                                      // Get the Ekakshar answer
+                                      setTimeout(() => {
+                                        const getEkaksharAnswer = async () => {
+                                          try {
+                                            setIsOnewordLoading(true);
+                                            const response = await AIService.getOneWordAnswer(question, selectedLanguage);
+                                            setOnewordAnswer(response);
+                                            setIsOnewordLoading(false);
+                                          } catch (error) {
+                                            console.error('Ekakshar error:', error);
+                                            addNotification('Failed to get Ekakshar answer', 'error');
+                                            setIsOnewordLoading(false);
+                                          }
+                                        };
+                                        getEkaksharAnswer();
+                                      }, 100);
+                                    }}
+                                  >
+                                    <Wand2 size={16} /> Get One-Word Summary
+                                  </button>
+                                  <button
+                                    className="copy-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      fallbackToClipboard(answers[modeKey], `${modeConfig.name} Answer`);
+                                    }}
+                                    title="Copy answer to clipboard"
+                                  >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                                      <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    className="download-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      // Create a Blob with the content
+                                      const blob = new Blob([answers[modeKey]], { type: 'text/plain' });
+                                      const url = URL.createObjectURL(blob);
+                                      const a = document.createElement('a');
+                                      a.href = url;
+                                      a.download = `minimind-${modeKey}-answer-${Date.now()}.txt`;
+                                      document.body.appendChild(a);
+                                      a.click();
+                                      document.body.removeChild(a);
+                                      URL.revokeObjectURL(url);
+                                    }}
+                                    title="Download answer as text file"
+                                  >
+                                    <Download size={16} />
+                                  </button>
+                                  <button
+                                    className="share-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const shareData = {
+                                        title: `MiniMind ${modeConfig.name} Answer`,
+                                        text: answers[modeKey].substring(0, 100) + '...',
+                                        url: window.location.href
+                                      };
+
+                                      if (navigator.share) {
+                                        navigator.share(shareData).catch((error) => {
+                                          console.error('Share failed:', error);
+                                          // Fallback to clipboard if share fails
+                                          fallbackToClipboard(answers[modeKey], `${modeConfig.name} Answer`);
+                                        });
+                                      } else {
+                                        // Fallback for browsers that don't support Web Share API
+                                        fallbackToClipboard(answers[modeKey], `${modeConfig.name} Answer`);
                                       }
                                     }}
-                                    className="capsule-chat-form"
-                                    onClick={(e) => e.stopPropagation()}
+                                    title="Share answer"
                                   >
-                                    <input
-                                      name="capsuleInput"
-                                      type="text"
-                                      placeholder={`Chat with ${modeConfig.name}...`}
-                                      className="capsule-chat-input"
-                                    />
-                                    <motion.button 
-                                      type="submit"
-                                      className="capsule-send-btn"
-                                      whileHover={{ scale: 1.05 }}
-                                      whileTap={{ scale: 0.95 }}
-                                    >
-                                      <Send size={14} />
-                                    </motion.button>
-                                  </form>
-                                </>
-                              ) : (
-                                <div className="waiting-state">
-                                  <p>Ready to explain...</p>
+                                    <Share2 size={16} />
+                                  </button>
                                 </div>
-                              )}
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                                {/* Chat input for capsule */}
+                                <form
+                                  onSubmit={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const input = e.target.elements.capsuleInput;
+                                    const message = input.value.trim();
+                                    if (message) {
+                                      // Initialize chat for this mode if not exists
+                                      if (!chatMessages[modeKey]) {
+                                        setChatMessages(prev => ({
+                                          ...prev,
+                                          [modeKey]: [{ type: 'ai', content: answers[modeKey], timestamp: Date.now() }]
+                                        }));
+                                      }
+                                      handleFullscreenModeChange(modeKey, answers[modeKey], question);
+                                      // Add user message to chat after entering fullscreen
+                                      setTimeout(() => {
+                                        setChatMessages(prev => ({
+                                          ...prev,
+                                          [modeKey]: [...(prev[modeKey] || []), { type: 'user', content: message }]
+                                        }));
+                                      }, 100);
+                                      input.value = '';
+                                    }
+                                  }}
+                                  className="capsule-chat-form"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <input
+                                    name="capsuleInput"
+                                    type="text"
+                                    placeholder={`Chat with ${modeConfig.name}...`}
+                                    className="capsule-chat-input"
+                                  />
+                                  <motion.button
+                                    type="submit"
+                                    className="capsule-send-btn"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                  >
+                                    <Send size={14} />
+                                  </motion.button>
+                                </form>
+                              </>
+                            ) : (
+                              <div className="waiting-state">
+                                <p>Ready to explain...</p>
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Fullscreen Mode */}
             <AnimatePresence>
@@ -2226,15 +2183,15 @@ Shared from MiniMind AI`;
                       <span className="mode-icon">{modes[fullscreenMode].icon}</span>
                       <h2>{modes[fullscreenMode].name} Mode</h2>
                     </div>
-                    
-                    <ModeSwitcher 
+
+                    <ModeSwitcher
                       currentMode={fullscreenMode}
                       onModeChange={handleFullscreenModeChange}
                       enabledModes={enabledModes}
                       answers={answers}
                       question={question}
                     />
-                    
+
                     <button
                       className="back-btn"
                       onClick={() => setFullscreenMode(null)}
@@ -2242,17 +2199,17 @@ Shared from MiniMind AI`;
                       <ArrowLeft size={20} />
                     </button>
                   </div>
-                  
+
                   <div className="chat-container">
                     <div className="chat-messages fullscreen-scroll" ref={chatContainerRef}>
                       {chatMessages[fullscreenMode]?.map((msg, idx) => (
                         <div key={idx} className={`message ${msg.type}`}>
                           {msg.type === 'ai' ? (
                             <>
-                              <div 
+                              <div
                                 className="message-content"
-                                dangerouslySetInnerHTML={{ 
-                                  __html: formatAnswer(msg.content) 
+                                dangerouslySetInnerHTML={{
+                                  __html: formatAnswer(msg.content)
                                 }}
                               />
                               <div className="message-controls">
@@ -2292,8 +2249,8 @@ Shared from MiniMind AI`;
                                   title="Copy answer to clipboard"
                                 >
                                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
                                   </svg>
                                 </button>
                                 <button
@@ -2322,7 +2279,7 @@ Shared from MiniMind AI`;
                                       text: msg.content.substring(0, 100) + '...',
                                       url: window.location.href
                                     };
-                                    
+
                                     if (navigator.share) {
                                       navigator.share(shareData).catch((error) => {
                                         console.error('Share failed:', error);
@@ -2358,8 +2315,8 @@ Shared from MiniMind AI`;
                         </div>
                       ))}
                     </div>
-                    
-                    <form 
+
+                    <form
                       onSubmit={(e) => handleChatSubmit(e, fullscreenMode)}
                       className="chat-input-form"
                     >
@@ -2397,7 +2354,7 @@ Shared from MiniMind AI`;
                     <h2>Your Learning Progress</h2>
                     <p>Track your learning journey across different modes and topics.</p>
                   </div>
-                  
+
                   {/* Progress Stats */}
                   <div className="progress-stats">
                     <div className="stat-card">
@@ -2417,7 +2374,7 @@ Shared from MiniMind AI`;
                       <div className="stat-label">Unique Topics</div>
                     </div>
                   </div>
-                  
+
                   {/* Mode Distribution */}
                   <div className="mode-distribution">
                     <h3>Mode Usage Distribution</h3>
@@ -2425,15 +2382,15 @@ Shared from MiniMind AI`;
                       {Object.entries(modes).map(([modeKey, modeConfig]) => {
                         const modeCount = history.filter(entry => entry.answers[modeKey]).length;
                         const percentage = history.length > 0 ? (modeCount / history.length) * 100 : 0;
-                        
+
                         return (
                           <div key={modeKey} className={`distribution-bar ${modeKey}`}>
                             <div className="mode-icon-container">
                               <span className="mode-icon">{modeConfig.icon}</span>
                             </div>
                             <div className="bar-container">
-                              <div 
-                                className="bar-fill" 
+                              <div
+                                className="bar-fill"
                                 style={{ width: `${percentage}%` }}
                               ></div>
                             </div>
@@ -2445,7 +2402,7 @@ Shared from MiniMind AI`;
                       })}
                     </div>
                   </div>
-                  
+
                   {/* Learning Timeline */}
                   <div className="timeline-section">
                     <h3>Learning Timeline</h3>
@@ -2469,7 +2426,7 @@ Shared from MiniMind AI`;
                       ))}
                     </div>
                   </div>
-                  
+
                   {/* Badges Section */}
                   <div className="badges-section">
                     <h3>Your Achievements</h3>
@@ -2495,7 +2452,7 @@ Shared from MiniMind AI`;
                         <div className="badge-name">Scholar</div>
                         <div className="badge-description">Ask 25 questions</div>
                       </div>
-                      
+
                       {/* Mode Badges */}
                       <div className={`badge ${Object.keys(modes).every(mode => enabledModes[mode]) ? 'earned' : ''}`}>
                         <div className="badge-icon">🔄</div>
@@ -2507,7 +2464,7 @@ Shared from MiniMind AI`;
                         <div className="badge-name">Versatile</div>
                         <div className="badge-description">Use 3+ modes</div>
                       </div>
-                      
+
                       {/* Language Badges */}
                       <div className={`badge ${selectedLanguage !== 'en' ? 'earned' : ''}`}>
                         <div className="badge-icon">🌐</div>
@@ -2529,7 +2486,7 @@ Shared from MiniMind AI`;
                     <h2>Ekakshar - One Word AI Assistant</h2>
                     <p>Get quick, concise answers in just one word or bullet-point summaries. Perfect for vocabulary, definitions, and fast facts.</p>
                   </div>
-                  
+
                   <div className="oneword-interface">
                     <form onSubmit={handleOnewordSubmit} className="oneword-input-section">
                       <input
@@ -2550,9 +2507,9 @@ Shared from MiniMind AI`;
                         )}
                       </button>
                     </form>
-                    
+
                     {onewordAnswer && (
-                      <motion.div 
+                      <motion.div
                         className="oneword-answer"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -2610,8 +2567,8 @@ Shared from MiniMind AI`;
                             title="Copy answer to clipboard"
                           >
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                              <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
                             </svg>
                           </button>
                           <button
@@ -2640,7 +2597,7 @@ Shared from MiniMind AI`;
                                 text: onewordAnswer.substring(0, 100) + '...',
                                 url: window.location.href
                               };
-                              
+
                               if (navigator.share) {
                                 navigator.share(shareData).catch((error) => {
                                   console.error('Share failed:', error);
@@ -2659,7 +2616,7 @@ Shared from MiniMind AI`;
                         </div>
                       </motion.div>
                     )}
-                    
+
                     <div className="oneword-examples">
                       <h3>Try asking for one-word answers or bullet summaries:</h3>
                       <div className="example-grid">
@@ -2680,7 +2637,7 @@ Shared from MiniMind AI`;
                     <h2>Learning History</h2>
                     <p>Review your past questions and answers across all learning modes.</p>
                   </div>
-                  
+
                   {/* History Controls */}
                   <div className="history-controls">
                     {/* Search Bar */}
@@ -2693,7 +2650,7 @@ Shared from MiniMind AI`;
                         onChange={(e) => setHistorySearchTerm(e.target.value)}
                       />
                       {historySearchTerm && (
-                        <button 
+                        <button
                           className="clear-history-search"
                           onClick={() => setHistorySearchTerm('')}
                         >
@@ -2701,10 +2658,10 @@ Shared from MiniMind AI`;
                         </button>
                       )}
                     </div>
-                    
+
                     {/* Filters */}
                     <div className="history-filters">
-                      <select 
+                      <select
                         className="filter-select"
                         value={historyFilterMode || ''}
                         onChange={(e) => setHistoryFilterMode(e.target.value || '')}
@@ -2717,8 +2674,8 @@ Shared from MiniMind AI`;
                         ))}
                         <option value="oneword">Ekakshar</option>
                       </select>
-                      
-                      <select 
+
+                      <select
                         className="filter-select"
                         value={historyFilterLanguage || ''}
                         onChange={(e) => setHistoryFilterLanguage(e.target.value || '')}
@@ -2730,8 +2687,8 @@ Shared from MiniMind AI`;
                           </option>
                         ))}
                       </select>
-                      
-                      <select 
+
+                      <select
                         className="filter-select"
                         value={historySortBy || 'newest'}
                         onChange={(e) => setHistorySortBy(e.target.value)}
@@ -2739,8 +2696,8 @@ Shared from MiniMind AI`;
                         <option value="newest">Newest First</option>
                         <option value="oldest">Oldest First</option>
                       </select>
-                      
-                      <button 
+
+                      <button
                         className="clear-filters-btn"
                         onClick={() => {
                           setHistoryFilterMode('');
@@ -2752,23 +2709,23 @@ Shared from MiniMind AI`;
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* History Actions */}
                   <div className="history-actions">
-                    <button 
+                    <button
                       className="export-history-btn"
                       onClick={exportHistory}
                     >
                       <Download size={16} /> Export History
                     </button>
-                    <button 
+                    <button
                       className="clear-history-btn"
                       onClick={clearAllHistory}
                     >
                       <X size={16} /> Clear All History
                     </button>
                   </div>
-                  
+
                   {filteredHistory.length > 0 ? (
                     <div className="history-list">
                       {filteredHistory.map((entry) => (
@@ -2800,24 +2757,24 @@ Shared from MiniMind AI`;
                                 <div className="answer-header">
                                   <strong>{modes[mode]?.name || mode}: </strong>
                                   <div className="answer-controls">
-                                    <button 
+                                    <button
                                       className="speak-btn-small"
                                       onClick={() => handleSpeak(answer, mode)}
                                       title="Listen to answer"
                                     >
                                       <Volume2 size={14} />
                                     </button>
-                                    <button 
+                                    <button
                                       className="copy-btn-small"
                                       onClick={() => fallbackToClipboard(answer, `${modes[mode]?.name} Answer`)}
                                       title="Copy to clipboard"
                                     >
                                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
                                       </svg>
                                     </button>
-                                    <button 
+                                    <button
                                       className="share-btn-small"
                                       onClick={() => {
                                         const shareData = {
@@ -2825,7 +2782,7 @@ Shared from MiniMind AI`;
                                           text: answer.substring(0, 100) + '...',
                                           url: window.location.href
                                         };
-                                        
+
                                         if (navigator.share) {
                                           navigator.share(shareData).catch((error) => {
                                             console.error('Share failed:', error);
@@ -2841,32 +2798,32 @@ Shared from MiniMind AI`;
                                     </button>
                                   </div>
                                 </div>
-                                <div 
+                                <div
                                   className="answer-content"
-                                  dangerouslySetInnerHTML={{ 
-                                    __html: formatAnswer(answer) 
-                                  }} 
+                                  dangerouslySetInnerHTML={{
+                                    __html: formatAnswer(answer)
+                                  }}
                                 />
                               </div>
                             ))}
                           </div>
                           <div className="history-entry-actions">
-                            <button 
+                            <button
                               className="pin-btn"
                               onClick={() => pinHistoryEntry(entry.id)}
                             >
                               {entry.pinned ? 'Unpin' : 'Pin'}
                             </button>
-                            <button 
+                            <button
                               className="replay-btn"
                               onClick={() => loadHistoryEntry(entry)}
                             >
                               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polygon points="5 3 19 12 5 21 5 3"/>
+                                <polygon points="5 3 19 12 5 21 5 3" />
                               </svg>
                               Replay
                             </button>
-                            <button 
+                            <button
                               className="delete-btn"
                               onClick={() => deleteHistoryEntry(entry.id)}
                             >
@@ -2890,7 +2847,7 @@ Shared from MiniMind AI`;
                     <h2>Meet the Minds Behind MINIMIND</h2>
                     <p>At MINIMIND, we believe in creating more than just a platform — we're building an experience.</p>
                   </div>
-                  
+
                   <div className="team-grid">
                     <div className="team-member">
                       <div className="member-icon">🧠</div>
@@ -2898,21 +2855,21 @@ Shared from MiniMind AI`;
                       <h4>Backend Developer</h4>
                       <p>Yuvraj is the powerhouse behind our backend systems. From building robust APIs to implementing secure and scalable server logic, he ensures MINIMIND performs seamlessly under the hood, so users get speed, stability, and security.</p>
                     </div>
-                    
+
                     <div className="team-member">
                       <div className="member-icon">🛡️</div>
                       <h3>Ushma Talreja</h3>
                       <h4>Quality Assurance Specialist</h4>
                       <p>Ushma ensures that MINIMIND runs like a well-oiled machine. With a sharp eye for detail, she rigorously tests every feature, hunts down bugs, and proactively recommends enhancements — all to deliver a flawless and enjoyable user experience.</p>
                     </div>
-                    
+
                     <div className="team-member">
                       <div className="member-icon">🔧</div>
                       <h3>Ishita Bajpai</h3>
                       <h4>Product Development Associate</h4>
                       <p>Ishita brings flexibility and curiosity to the table, contributing across various stages of product development. Her multidisciplinary approach helps drive innovation as she explores her niche within the team.</p>
                     </div>
-                    
+
                     <div className="team-member">
                       <div className="member-icon">🎨</div>
                       <h3>Priyansh Gautam</h3>
@@ -2921,7 +2878,7 @@ Shared from MiniMind AI`;
                     </div>
                   </div>
                 </div>
-                
+
               )}
               {currentPage === 'faq' && (
                 <div className="faq-page">
@@ -2929,67 +2886,67 @@ Shared from MiniMind AI`;
                     <h2>Frequently Asked Questions</h2>
                     <p>Find answers to common questions about MINIMIND.</p>
                   </div>
-                  
+
                   <div className="faq-list">
                     <div className="faq-item">
                       <h3>Q: How can I track my learning progress on MINIMIND?</h3>
                       <p>A: Our platform includes a dedicated Progress Tracker that shows your completed modules, time spent on each topic, and areas for improvement. You can set personal learning goals and monitor your achievements.</p>
                     </div>
-                    
+
                     <div className="faq-item">
                       <h3>Q: Is there a cost associated with using MINIMIND?</h3>
                       <p>A: MINIMIND offers a free tier with access to essential features. Premium content and advanced functionalities will be available through a subscription model, but we ensure that core learning remains accessible to all users.</p>
                     </div>
-                    
+
                     <div className="faq-item">
                       <h3>Q: How does MINIMIND handle user feedback?</h3>
                       <p>A: We value user input and have a dedicated team to review all feedback. Suggestions for new features or content are prioritized based on user demand and feasibility.</p>
                     </div>
-                    
+
                     <div className="faq-item">
                       <h3>Q: Can I delete my account and data?</h3>
                       <p>A: Yes, you can delete your account at any time through your profile settings. All associated data will be permanently removed from our servers.</p>
                     </div>
-                    
+
                     <div className="faq-item">
                       <h3>Q: What if I encounter a technical issue while using MINIMIND?</h3>
                       <p>A: Our support team is available 24/7 to assist you with any technical difficulties. You can reach out via the in-app support feature or our website's contact form.</p>
                     </div>
-                    
+
                     <div className="faq-item">
                       <h3>Q: How do the learning modes differ from one another?</h3>
-                      <p>A: Each learning mode is tailored to specific age groups and expertise levels:<br/>
-                      Beginner Mode: Simplified explanations and relatable examples<br/>
-                      Teen Mode: Engaging content with real-world applications<br/>
-                      College Mode: In-depth analysis and technical details<br/>
-                      Mastery Mode: Advanced concepts and critical thinking challenges</p>
+                      <p>A: Each learning mode is tailored to specific age groups and expertise levels:<br />
+                        Beginner Mode: Simplified explanations and relatable examples<br />
+                        Teen Mode: Engaging content with real-world applications<br />
+                        College Mode: In-depth analysis and technical details<br />
+                        Mastery Mode: Advanced concepts and critical thinking challenges</p>
                     </div>
-                    
+
                     <div className="faq-item">
                       <h3>Q: Are there interactive elements in the learning modules?</h3>
                       <p>A: Yes! Our learning capsules include quizzes, interactive exercises, and discussion prompts to reinforce understanding and encourage active participation.</p>
                     </div>
-                    
+
                     <div className="faq-item">
                       <h3>Q: How does MINIMIND support different learning styles?</h3>
                       <p>A: We incorporate various formats, including text, audio, and visual aids, to cater to diverse learning preferences. Users can choose their preferred mode of engagement for each topic.</p>
                     </div>
-                    
+
                     <div className="faq-item">
                       <h3>Q: What new features have been added to enhance the user experience?</h3>
                       <p>A: We've recently added several enhancements including improved dark mode support, enhanced language selection dropdowns, better text visibility in input fields, and updated team information. We've also improved the progress tracking system and added more interactive elements to make learning more engaging.</p>
                     </div>
-                    
+
                     <div className="faq-item">
                       <h3>Q: How does the OneWord feature work?</h3>
                       <p>A: The OneWord feature provides quick, concise answers in just one word or bullet-point summaries. Perfect for vocabulary, definitions, and fast facts. Simply enter your question in the OneWord section and get instant concise answers.</p>
                     </div>
-                    
+
                     <div className="faq-item">
                       <h3>Q: Can I use MINIMIND in different languages?</h3>
                       <p>A: Yes, MINIMIND supports multiple languages including English, Hindi, Spanish, French, German, and many more. You can easily switch between languages in the language settings. We also offer Roman script options for Indian languages for easier typing.</p>
                     </div>
-                    
+
                     <div className="faq-item">
                       <h3>Q: How is my data protected on MINIMIND?</h3>
                       <p>A: We take data privacy seriously. All your learning data is securely stored and encrypted. You have full control over your data and can delete your account and all associated data at any time. We never sell or share your personal information with third parties.</p>
@@ -3003,7 +2960,7 @@ Shared from MiniMind AI`;
                     <h2>Your Learning Progress</h2>
                     <p>Track your learning journey across different modes and topics.</p>
                   </div>
-                  
+
                   {/* Progress Stats */}
                   <div className="progress-stats">
                     <div className="stat-item">
@@ -3019,7 +2976,7 @@ Shared from MiniMind AI`;
                       <p>{Object.keys(modes).filter(mode => enabledModes[mode]).length}</p>
                     </div>
                   </div>
-                  
+
                   {/* Mode Distribution */}
                   <div className="mode-distribution">
                     <h3>Learning Mode Distribution</h3>
@@ -3027,15 +2984,15 @@ Shared from MiniMind AI`;
                       {Object.entries(modes).map(([modeKey, modeConfig]) => {
                         const modeCount = history.filter(entry => entry.answers[modeKey]).length;
                         const percentage = history.length > 0 ? (modeCount / history.length) * 100 : 0;
-                        
+
                         return (
                           <div key={modeKey} className={`distribution-bar ${modeKey}`}>
                             <div className="mode-icon-container">
                               <span className="mode-icon">{modeConfig.icon}</span>
                             </div>
                             <div className="bar-container">
-                              <div 
-                                className="bar-fill" 
+                              <div
+                                className="bar-fill"
                                 style={{ width: `${percentage}%` }}
                               ></div>
                             </div>
@@ -3047,7 +3004,7 @@ Shared from MiniMind AI`;
                       })}
                     </div>
                   </div>
-                  
+
                   {/* Recent Activity */}
                   <div className="recent-activity">
                     <h3>Recent Learning Activity</h3>
@@ -3079,7 +3036,7 @@ Shared from MiniMind AI`;
                     <h2>Language & Script Settings</h2>
                     <p>Choose your preferred language and script style for AI responses.</p>
                   </div>
-                  
+
                   {/* Casual Mode Toggle */}
                   <div className="casual-mode-section">
                     <div className="setting-item">
@@ -3087,7 +3044,7 @@ Shared from MiniMind AI`;
                         <h3>Casual Mode (Roman Script)</h3>
                         <p>Get responses in Indian languages written with English alphabets (e.g., "Main accha hoon" instead of "मैं अच्छा हूं")</p>
                       </div>
-                      <button 
+                      <button
                         className={`toggle-btn ${casualMode ? 'active' : ''}`}
                         onClick={toggleCasualMode}
                         disabled={!languages[selectedLanguage]?.casual}
@@ -3096,7 +3053,7 @@ Shared from MiniMind AI`;
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Language Grid */}
                   <div className="language-grid">
                     {Object.entries(languages).map(([code, lang]) => (
@@ -3118,7 +3075,7 @@ Shared from MiniMind AI`;
                           )}
                         </div>
                         {selectedLanguage === code && (
-                          <motion.div 
+                          <motion.div
                             className="selection-indicator"
                             layoutId="language-selection"
                             initial={false}
@@ -3128,7 +3085,7 @@ Shared from MiniMind AI`;
                       </motion.button>
                     ))}
                   </div>
-                  
+
                   {/* Current Selection Info */}
                   <div className="current-selection">
                     <h3>Current Selection:</h3>
@@ -3148,25 +3105,25 @@ Shared from MiniMind AI`;
                     <h2>Settings & Preferences</h2>
                     <p>Customize your MiniMind experience with these personalization options.</p>
                   </div>
-                  
+
                   <div className="settings-grid">
                     {/* Theme Settings */}
                     <div className="setting-group">
                       <h3>Appearance</h3>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Theme</strong>
                           <span>Choose between light and dark modes</span>
                         </div>
                         <div className="theme-selector">
-                          <button 
+                          <button
                             className={`theme-btn ${theme === 'light' ? 'active' : ''}`}
                             onClick={() => theme !== 'light' && toggleTheme()}
                           >
                             <Sun size={16} /> Light
                           </button>
-                          <button 
+                          <button
                             className={`theme-btn ${theme === 'dark' ? 'active' : ''}`}
                             onClick={() => theme !== 'dark' && toggleTheme()}
                           >
@@ -3174,13 +3131,13 @@ Shared from MiniMind AI`;
                           </button>
                         </div>
                       </div>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Font Size</strong>
                           <span>Adjust text size for better readability</span>
                         </div>
-                        <select 
+                        <select
                           value={settings.fontSize}
                           onChange={(e) => updateSettings({ fontSize: e.target.value })}
                           className="setting-select"
@@ -3191,30 +3148,30 @@ Shared from MiniMind AI`;
                         </select>
                       </div>
                     </div>
-                    
+
                     {/* Audio Settings */}
                     <div className="setting-group">
                       <h3>Audio & Voice</h3>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Sound Responses</strong>
                           <span>Enable text-to-speech for AI answers</span>
                         </div>
-                        <button 
+                        <button
                           className={`toggle-btn ${settings.soundEnabled ? 'active' : ''}`}
                           onClick={() => updateSettings({ soundEnabled: !settings.soundEnabled })}
                         >
                           <div className="toggle-slider" />
                         </button>
                       </div>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Voice Language</strong>
                           <span>Default language for voice synthesis</span>
                         </div>
-                        <select 
+                        <select
                           value={settings.voiceLanguage}
                           onChange={(e) => updateSettings({ voiceLanguage: e.target.value })}
                           className="setting-select"
@@ -3225,17 +3182,17 @@ Shared from MiniMind AI`;
                         </select>
                       </div>
                     </div>
-                    
+
                     {/* Learning Preferences */}
                     <div className="setting-group">
                       <h3>Learning Preferences</h3>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Default Mode</strong>
                           <span>Your preferred starting learning mode</span>
                         </div>
-                        <select 
+                        <select
                           value={settings.defaultMode}
                           onChange={(e) => updateSettings({ defaultMode: e.target.value })}
                           className="setting-select"
@@ -3245,26 +3202,26 @@ Shared from MiniMind AI`;
                           ))}
                         </select>
                       </div>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Emojis in Responses</strong>
                           <span>Show emojis and visual elements in answers</span>
                         </div>
-                        <button 
+                        <button
                           className={`toggle-btn ${settings.emojisEnabled ? 'active' : ''}`}
                           onClick={() => updateSettings({ emojisEnabled: !settings.emojisEnabled })}
                         >
                           <div className="toggle-slider" />
                         </button>
                       </div>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Auto-scroll</strong>
                           <span>Automatically scroll to new content</span>
                         </div>
-                        <button 
+                        <button
                           className={`toggle-btn ${settings.autoScroll ? 'active' : ''}`}
                           onClick={() => updateSettings({ autoScroll: !settings.autoScroll })}
                         >
@@ -3272,30 +3229,30 @@ Shared from MiniMind AI`;
                         </button>
                       </div>
                     </div>
-                    
+
                     {/* Translation Settings */}
                     <div className="setting-group">
                       <h3>Translation & Script</h3>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Transliteration</strong>
                           <span>Enable real-time typing conversion to native scripts</span>
                         </div>
-                        <button 
+                        <button
                           className={`toggle-btn ${settings.transliterationEnabled ? 'active' : ''}`}
                           onClick={() => updateSettings({ transliterationEnabled: !settings.transliterationEnabled })}
                         >
                           <div className="toggle-slider" />
                         </button>
                       </div>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Script Preference</strong>
                           <span>Choose between native script or English script (Roman)</span>
                         </div>
-                        <select 
+                        <select
                           value={settings.scriptPreference}
                           onChange={(e) => updateSettings({ scriptPreference: e.target.value })}
                           className="setting-select"
@@ -3304,13 +3261,13 @@ Shared from MiniMind AI`;
                           <option value="english">English Script (Roman)</option>
                         </select>
                       </div>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Translation Mode</strong>
                           <span>Automatic or manual translation of responses</span>
                         </div>
-                        <select 
+                        <select
                           value={settings.autoTranslation}
                           onChange={(e) => updateSettings({ autoTranslation: e.target.value === 'true' })}
                           className="setting-select"
@@ -3319,13 +3276,13 @@ Shared from MiniMind AI`;
                           <option value="false">Manual Translation</option>
                         </select>
                       </div>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Typing Translator</strong>
                           <span>GBoard-like real-time typing conversion (type in English, see in selected language)</span>
                         </div>
-                        <button 
+                        <button
                           className={`toggle-btn ${settings.typingTranslatorEnabled ? 'active' : ''}`}
                           onClick={() => updateSettings({ typingTranslatorEnabled: !settings.typingTranslatorEnabled })}
                         >
@@ -3333,17 +3290,17 @@ Shared from MiniMind AI`;
                         </button>
                       </div>
                     </div>
-                    
+
                     {/* Data & Privacy */}
                     <div className="setting-group">
                       <h3>Data & Storage</h3>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Clear History</strong>
                           <span>Remove all saved questions and answers</span>
                         </div>
-                        <button 
+                        <button
                           className="danger-btn"
                           onClick={() => {
                             setHistory([]);
@@ -3354,13 +3311,13 @@ Shared from MiniMind AI`;
                           Clear All History
                         </button>
                       </div>
-                      
+
                       <div className="setting-item">
                         <div className="setting-info">
                           <strong>Reset Settings</strong>
                           <span>Restore all settings to default values</span>
                         </div>
-                        <button 
+                        <button
                           className="danger-btn"
                           onClick={() => {
                             const defaultSettings = {
@@ -3430,7 +3387,7 @@ Shared from MiniMind AI`;
               </div>
               <div className="language-grid">
                 {Object.entries(languages)
-                  .filter(([code, lang]) => 
+                  .filter(([code, lang]) =>
                     lang.name.toLowerCase().includes(languageSearchTerm.toLowerCase()) ||
                     lang.nativeName.toLowerCase().includes(languageSearchTerm.toLowerCase())
                   )
@@ -3484,7 +3441,7 @@ Shared from MiniMind AI`;
                   <X size={20} />
                 </button>
               </div>
-              
+
               <div className="translation-modal-content">
                 <div className="translation-controls">
                   <div className="language-selector">
@@ -3499,7 +3456,7 @@ Shared from MiniMind AI`;
                       ))}
                     </select>
                   </div>
-                  
+
                   <div className="language-selector">
                     <label>To:</label>
                     <select
@@ -3512,7 +3469,7 @@ Shared from MiniMind AI`;
                       ))}
                     </select>
                   </div>
-                  
+
                   <button
                     className="translate-btn-modal"
                     onClick={async () => {
@@ -3524,13 +3481,13 @@ Shared from MiniMind AI`;
                     Translate
                   </button>
                 </div>
-                
+
                 <div className="translation-text-container">
                   <div className="translation-text">
                     <h4>Original Text:</h4>
                     <div className="text-content">{translationText}</div>
                   </div>
-                  
+
                   <div className="translation-text">
                     <h4>Translated Text:</h4>
                     <div className="text-content translated">
