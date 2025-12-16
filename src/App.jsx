@@ -1867,55 +1867,77 @@ Shared from MiniMind AI`;
               )}
             </AnimatePresence>
 
-            {/* Refined Prompt Modal */}
+            {/* Refined Question Fullscreen View (Mobile Redesign) */}
             <AnimatePresence>
               {showRefinedPrompt && (
                 <motion.div
-                  className="modal-overlay"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setShowRefinedPrompt(false)}
+                  className="refined-fullscreen-mobile"
+                  initial={{ opacity: 0, y: '100%' }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: '100%' }}
+                  transition={{ type: "spring", damping: 25, stiffness: 300 }}
                 >
-                  <motion.div
-                    className="refined-prompt-modal"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  {/* Zone 1: Header */}
+                  <div className="rf-header">
+                    <button
+                      onClick={() => setShowRefinedPrompt(false)}
+                      className="rf-back-btn"
+                      aria-label="Close"
+                    >
+                      <ArrowLeft size={22} />
+                    </button>
                     <h3>Refined Question</h3>
-                    {isRefining ? (
-                      <div className="loading-text">
-                        <div className="typing-indicator">
-                          <span></span>
-                          <span></span>
-                          <span></span>
+                    <div className="rf-header-spacer" />
+                  </div>
+
+                  {/* Zone 2: Content & Context */}
+                  <div className="rf-scroll-area">
+                    <div className="rf-card">
+                      {isRefining ? (
+                        <div className="rf-loading">
+                          <div className="typing-indicator">
+                            <span></span><span></span><span></span>
+                          </div>
+                          <p>Optimizing your prompt using best practices...</p>
                         </div>
-                        <p>Refining your question...</p>
-                      </div>
-                    ) : (
-                      <FormattedText text={refinedPrompt} />
-                    )}
-                    <div className="modal-actions">
-                      <button
-                        onClick={() => {
-                          setQuestion(refinedPrompt);
-                          setShowRefinedPrompt(false);
-                        }}
-                        className="use-btn"
-                        disabled={isRefining}
-                      >
-                        Use This
-                      </button>
-                      <button
-                        onClick={() => setShowRefinedPrompt(false)}
-                        className="cancel-btn"
-                      >
-                        Cancel
-                      </button>
+                      ) : (
+                        <FormattedText
+                          text={refinedPrompt}
+                          className="rf-text-content"
+                        />
+                      )}
                     </div>
-                  </motion.div>
+
+                    {/* Zone 3: Status / Context */}
+                    {!isRefining && (
+                      <div className="rf-context-box">
+                        <Sparkles size={16} className="rf-context-icon" />
+                        <p>This version is clearer, more specific, and structured for the best possible AI response.</p>
+                      </div>
+                    )}
+
+                    <div className="rf-scroll-spacer" />
+                  </div>
+
+                  {/* Zone 4: Fixed Bottom Action Bar */}
+                  <div className="rf-bottom-bar">
+                    <button
+                      onClick={() => {
+                        setQuestion(refinedPrompt);
+                        setShowRefinedPrompt(false);
+                      }}
+                      className="rf-primary-btn"
+                      disabled={isRefining}
+                    >
+                      Use Refined Question
+                    </button>
+                    <button
+                      onClick={() => setShowRefinedPrompt(false)}
+                      className="rf-secondary-btn"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
