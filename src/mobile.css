@@ -12,53 +12,79 @@ body {
   -ms-text-size-adjust: 100%;
 }
 
-/* 2. Mobile Header Fixes */
+/* 2. Mobile Header Fixes (STABLE) */
 .header-bar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   width: 100%;
-  max-width: 100vw;
+  height: 56px;
+  /* Explicit locked height */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 0 8px;
+  /* Minimal padding */
   background: var(--bg-surface);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--nav-border);
   z-index: 1000;
   box-sizing: border-box;
-  margin: 0;
-  border: none;
-  gap: 8px;
-  /* Add gap to prevent touching */
 }
 
 .header-bar-center {
-  position: static;
-  /* Remove absolute positioning */
-  transform: none;
-  text-align: center;
   flex: 1;
-  /* Allow it to take available space */
-  margin: 0;
-  padding: 0;
   display: flex;
   justify-content: center;
+  align-items: center;
   overflow: hidden;
-  /* Prevent spillover */
-  white-space: nowrap;
 }
 
 .header-logo-text {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   color: var(--text-primary);
-  /* Use theme text color */
-  margin: 0;
+  white-space: nowrap;
+}
+
+/* Stable Controls - No Floating */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* Tight toolbar feel */
+}
+
+/* Mobile Specific Control Buttons */
+.theme-toggle-btn-mobile,
+.language-btn-mobile {
+  background: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  cursor: pointer;
   padding: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.theme-toggle-btn-mobile:active,
+.language-btn-mobile:active {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.lang-code {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Hide desktop specific if any leaked */
+.show-prompts-btn {
+  display: none;
 }
 
 /* 3. Mobile Navigation Toggle */
@@ -68,33 +94,31 @@ body {
   padding: 8px;
   margin: 0;
   cursor: pointer;
+  color: var(--text-primary) !important;
+  /* Fix for dark mode visibility */
   z-index: 1001;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* 4. Mobile Navigation Drawer */
+/* 4. Mobile Navigation Drawer Refined */
 .mobile-nav-drawer {
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
-  width: 280px;
-  max-width: 85%;
-  background: var(--bg-primary, #ffffff);
-  z-index: 1100;
-  padding: 20px 0;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  width: 85%;
+  max-width: 320px;
+  background: var(--bg-surface);
+  z-index: 2000;
+  padding: 0;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
   transform: translateX(-100%);
   will-change: transform;
-  transition: transform 0.3s ease-in-out;
-}
-
-.mobile-nav-drawer.open {
-  transform: translateX(0);
+  border-right: 1px solid var(--nav-border);
 }
 
 .mobile-nav-backdrop {
@@ -103,16 +127,186 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1099;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1999;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease-in-out;
 }
 
-.mobile-nav-backdrop.visible {
-  opacity: 1;
-  pointer-events: auto;
+.mobile-nav-header {
+  padding: 24px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--nav-border);
+  background: var(--bg-surface);
+}
+
+.nav-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-header-brand .brand-icon {
+  font-size: 24px;
+}
+
+.nav-header-brand h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.mobile-nav-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 8px;
+  margin: -8px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nav-group-title {
+  padding: 0 12px;
+  width: 100%;
+  margin: 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+.nav-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-primary);
+}
+
+.mobile-nav-item:active {
+  background: var(--bg-secondary);
+  transform: scale(0.98);
+}
+
+.mobile-nav-item.active {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.nav-item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--item-color) 10%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--item-color);
+}
+
+.mobile-nav-item.active .nav-item-icon {
+  background: var(--item-color);
+  color: #ffffff;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--item-color) 40%, transparent);
+}
+
+.nav-item-label {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.active-indicator {
+  color: var(--item-color);
+}
+
+.mobile-nav-footer {
+  padding: 24px 20px;
+  border-top: 1px solid var(--nav-border);
+  background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.nav-auth-btn {
+  width: 100%;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--nav-border);
+  border-radius: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.app-version {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+/* Dark Mode Overrides for Drawer */
+[data-theme='dark'] .mobile-nav-drawer {
+  background: #0b0b0b;
+  /* Deep black-gray */
+  border-right: 1px solid #222;
+}
+
+[data-theme='dark'] .mobile-nav-header,
+[data-theme='dark'] .mobile-nav-footer {
+  background: #0b0b0b;
+  border-color: #222;
+}
+
+[data-theme='dark'] .mobile-nav-item:active,
+[data-theme='dark'] .mobile-nav-item.active {
+  background: #1a1a1a;
 }
 
 /* 5. Main Content Area */
@@ -153,8 +347,8 @@ select {
 /* 8. Safe Area Insets for Notch Devices */
 @supports (padding: max(0px)) {
   .header-bar {
-    padding-top: max(12px, env(safe-area-inset-top));
-    padding-bottom: 12px;
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: 8px;
     padding-left: max(16px, env(safe-area-inset-left));
     padding-right: max(16px, env(safe-area-inset-right));
   }
@@ -280,19 +474,65 @@ textarea {
   /* Common Page Padding & Layout */
   .page {
     padding: 16px !important;
+    padding-top: 12px !important;
+    /* Reduced top padding */
     width: 100% !important;
     max-width: 100vw !important;
     overflow-x: hidden !important;
   }
 
+  /* FIXED: Back button top-left, compact header */
   .page-header {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
+    display: flex !important;
+    flex-direction: row !important;
+    /* Force row */
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    gap: 16px !important;
+    margin-bottom: 16px !important;
+    /* Tighter spacing */
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--nav-border);
   }
 
   .page-header h1 {
-    font-size: 1.75rem !important;
+    font-size: 1.5rem !important;
+    /* Adjusted for mobile */
+    margin: 0 !important;
+    line-height: 1.2;
+    flex: 1;
+  }
+
+  .back-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    border: 1px solid var(--nav-border);
+    margin: 0 !important;
+    /* No extra margin */
+  }
+
+  /* Remove internal page header duplications visually if any remain */
+  .page-header-content {
+    text-align: left !important;
+    margin-bottom: 20px !important;
+  }
+
+  .page-header-content h2 {
+    display: none !important;
+    /* Hide duplicate H2s if missed in global find/replace */
+  }
+
+  .page-header-content p {
+    text-align: left !important;
+    font-size: 0.95rem !important;
+    margin: 0 !important;
+    opacity: 0.8;
   }
 
   /* Progress Page */
@@ -425,6 +665,8 @@ textarea {
 
   .team-member {
     padding: 24px 16px !important;
+    width: 100% !important;
+    /* Ensure full width on mobile */
   }
 
   /* FAQ Page */
@@ -498,5 +740,201 @@ textarea {
 
   .page-header-content h2 {
     font-size: 1.75rem !important;
+  }
+
+  /* 22. Ekakshar Width Fix */
+  .oneword-page {
+    padding: 0 !important;
+  }
+
+  .oneword-page .page-header-content {
+    padding: 16px !important;
+  }
+
+  .oneword-interface {
+    padding: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .oneword-input {
+    font-size: 16px !important;
+    /* Prevent zoom */
+  }
+
+  /* 23. Home Page Center Fix */
+  .chat-controls {
+    justify-content: center !important;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    /* Allow stacking */
+    align-items: center;
+  }
+
+  .mode-filter {
+    margin: 0 auto;
+  }
+
+  /* 24. Mobile Fullscreen Fixes */
+  .fullscreen-mode {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Use bottom 0 instead of height 100% */
+    height: auto !important;
+    width: 100% !important;
+    z-index: 2000 !important;
+    background: var(--bg-surface);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fullscreen-mode .chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fullscreen-mode .chat-messages {
+    padding-bottom: 90px !important;
+    /* Clear the input bar */
+    height: auto !important;
+    flex: 1;
+  }
+
+  .fullscreen-mode .chat-input-form {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    background: var(--bg-surface);
+    border-top: 1px solid var(--nav-border);
+    z-index: 10;
+  }
+
+  /* 25. Mobile Mode Selector Pills */
+  .mobile-mode-pills {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 8px;
+    /* Padding for scroll clipping */
+    width: 100%;
+    max-width: 100vw;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* Hide scrollbar Firefox */
+    margin-bottom: 12px;
+    justify-content: flex-start;
+    /* Start align for scroll */
+  }
+
+  .mobile-mode-pills::-webkit-scrollbar {
+    display: none;
+    /* Hide scrollbar Chrome/Safari */
+  }
+
+  .mode-pill {
+    flex: 0 0 auto;
+    /* Don't shrink */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--nav-border);
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mode-pill.active {
+    background: var(--brand-primary);
+    color: #ffffff;
+    border-color: var(--brand-primary);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  }
+
+  .mode-pill .mode-icon {
+    font-size: 1.1rem;
+  }
+
+  /* 26. Home Page Hero Optimizations */
+  .header {
+    min-height: auto !important;
+    padding: 16px 16px 24px 16px !important;
+    background: var(--bg-surface) !important;
+    /* Clean solid background */
+    border-radius: 0 0 24px 24px !important;
+    gap: 12px !important;
+    box-shadow: none !important;
+    /* Remove distraction */
+    background-image: none !important;
+    /* Remove any texture */
+  }
+
+  .hero-container {
+    gap: 8px !important;
+    margin-top: 0 !important;
+  }
+
+  .hero-logo-container {
+    padding: 0 !important;
+    margin: 4px 0 !important;
+    width: auto !important;
+    max-width: 180px !important;
+  }
+
+  .logo {
+    font-size: 2rem !important;
+    /* Smaller logo */
+    text-shadow: none !important;
+    /* Cleaner look */
+  }
+
+  .tagline {
+    font-size: 0.95rem !important;
+    margin-top: 4px !important;
+    opacity: 0.8 !important;
+  }
+
+  /* 27. Mode Pills Optimization */
+  /* 27. Mode Pills Optimization - Fixed Grid Layout */
+  .mobile-mode-pills {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    padding: 0 16px 24px 16px !important;
+    margin-bottom: 0 !important;
+    overflow-x: visible !important;
+    justify-content: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .mobile-mode-pills::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .mode-pill {
+    width: 100% !important;
+    flex: none !important;
+    justify-content: center !important;
+    padding: 14px 12px !important;
+    font-size: 0.95rem !important;
+    border-radius: 16px !important;
+    margin: 0 !important;
+    text-align: center !important;
   }
 }

@@ -25,13 +25,17 @@ import {
   ToggleLeft,
   ToggleRight,
   Download,
-  Share2
+  Share2,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 // Using the new NetlifyAIService which communicates with our secure Netlify Function
 import AIService from './services/aiService.js';
 import { transliterate } from 'transliteration';
+import FormattedText from './components/FormattedText';
 import './App.css';
 import './mobile.css';
+import './mobile_fullscreen.css';
 import MobileApp from './MobileApp';
 
 // Speech Controls Component
@@ -257,8 +261,25 @@ const ModeSwitcher = ({ currentMode, onModeChange, enabledModes, answers, questi
 };
 
 // Mode filter dropdown
-const ModeFilter = ({ enabledModes, onToggleMode }) => {
+const ModeFilter = ({ enabledModes, onToggleMode, isMobile }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  if (isMobile) {
+    return (
+      <div className="mobile-mode-pills">
+        {Object.entries(modes).map(([modeKey, modeConfig]) => (
+          <button
+            key={modeKey}
+            className={`mode-pill ${enabledModes[modeKey] ? 'active' : ''}`}
+            onClick={() => onToggleMode(modeKey)}
+          >
+            <span className="mode-icon">{modeConfig.icon}</span>
+            <span>{modeConfig.name}</span>
+          </button>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="mode-filter">
@@ -365,6 +386,13 @@ function App() {
   const [historySortBy, setHistorySortBy] = useState('newest');
   // Suggested prompts for the hero section
   const [showSuggestedPrompts, setShowSuggestedPrompts] = useState(true);
+
+  // FAQ Accordion State
+  const [expandedFaqIndex, setExpandedFaqIndex] = useState(null);
+
+  // History Accordion State
+  const [expandedHistoryId, setExpandedHistoryId] = useState(null);
+  const [expandedHistoryMode, setExpandedHistoryMode] = useState(null); // Tracks active tab within expanded entry
 
   // Generate random curiosity-testing prompts
   const generateRandomPrompts = () => {
@@ -484,64 +512,9 @@ function App() {
   }, [chatMessages, fullscreenMode]);
 
   // Function to format AI answers with bold text instead of stars and hashtags
+  // DEPRECATED: Using FormattedText component instead
   const formatAnswer = (answer) => {
-    if (answer == null) return '';
-
-    // Ensure we always work with a string to avoid runtime errors when
-    // the AI returns structured content or unexpected types.
-    let formatted = typeof answer === 'string' ? answer : String(answer);
-
-    // Remove hashtags and format as section headers
-    formatted = formatted.replace(/###\s*(.*?)\n/g, '<h3 class="section-header">$1</h3>');
-    formatted = formatted.replace(/##\s*(.*?)\n/g, '<h2 class="section-header">$1</h2>');
-    formatted = formatted.replace(/#\s*(.*?)\n/g, '<h4 class="section-header">$1</h4>');
-
-    // Convert markdown-style bold (**text**) to HTML bold with primary highlight theme
-    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="highlight-text theme-bold">$1<\/strong>');
-
-    // Convert single-asterisk wrapped text (*text*) to a tilt/italic style,
-    // avoiding list markers or parts of **bold** that were already handled.
-    formatted = formatted.replace(/(^|[\s(])\*(?!\*)([^*]+?)\*(?=[\s).,!?:;]|$)/g, '$1<em class="tilt-text">$2<\/em>');
-
-    // Double-underscore __text__ for bold text with a soft background highlight
-    formatted = formatted.replace(/__([^_]+?)__/g, '<strong class="highlight-bg">$1<\/strong>');
-
-    // Caret markers ^^text^^ for slightly larger, attention-grabbing text
-    formatted = formatted.replace(/\^\^(.*?)\^\^/g, '<span class="large-text">$1<\/span>');
-
-    // Format numbered lists
-    formatted = formatted.replace(/^(\d+\.)\s*(.*?)$/gm, '<div class="numbered-item"><span class="number">$1</span><span class="content">$2</span></div>');
-
-    // Format bullet points with different markers
-    formatted = formatted.replace(/^[-•*]\s*(.*?)$/gm, '<div class="bullet-item"><span class="bullet">•<\/span><span class="content">$1<\/span><\/div>');
-
-    // Format mathematical formulas (LaTeX-like) with better handling
-    // Handle incomplete formulas first
-    formatted = formatted.replace(/\\\[([^\]]*?)(?:\\\]|$)/gs, '<div class="formula-block">$1</div>');
-    formatted = formatted.replace(/\\\(([^\)]*?)(?:\\\)|$)/g, '<span class="formula-inline">$1</span>');
-
-    // Handle standard LaTeX formatting
-    formatted = formatted.replace(/\\\[(.*?)\\\]/gs, '<div class="formula-block">$1</div>');
-    formatted = formatted.replace(/\\\((.*?)\\\)/g, '<span class="formula-inline">$1</span>');
-
-    // Handle simple math expressions in square brackets
-    formatted = formatted.replace(/\[(.*?)\]/g, '<span class="formula-inline">$1</span>');
-
-    // Format code blocks
-    formatted = formatted.replace(/```(.*?)```/gs, '<pre class="code-block">$1</pre>');
-    formatted = formatted.replace(/`(.*?)`/g, '<code class="inline-code">$1</code>');
-
-    // Convert colons after terms to create definition-style formatting
-    formatted = formatted.replace(/^\s*([A-Za-z][^:]*?):\s*/gm, '<div class="definition-term">$1:</div>');
-
-    // Add proper line breaks and spacing
-    formatted = formatted.replace(/\n\n/g, '<br><br>');
-    formatted = formatted.replace(/\n/g, '<br>');
-
-    // Clean up extra spacing
-    formatted = formatted.replace(/(<br>){3,}/g, '<br><br>');
-
-    return formatted;
+    return answer;
   };
 
   // Enhanced theme and settings management
@@ -1574,36 +1547,78 @@ Shared from MiniMind AI`;
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
               <div className="mobile-nav-header">
-                <span className="mobile-nav-logo">MiniMind</span>
+                <div className="nav-header-brand">
+                  <span className="brand-icon">🧠</span>
+                  <h3>MiniMind</h3>
+                </div>
                 <button
                   className="mobile-nav-close"
                   onClick={() => setIsMobileNavOpen(false)}
                   aria-label="Close navigation menu"
                 >
-                  <X size={20} />
+                  <X size={24} />
                 </button>
               </div>
-              <div className="mobile-nav-items">
-                {navigationItems.map((item) => (
-                  <button
-                    key={item.id}
-                    className={`mobile-nav-item ${currentPage === item.id ? 'active' : ''}`}
-                    onClick={() => {
-                      setCurrentPage(item.id);
-                      setIsMobileNavOpen(false);
-                    }}
-                  >
-                    <item.icon size={20} />
-                    <span>{item.label}</span>
-                  </button>
-                ))}
-                <button className="mobile-nav-item">
-                  <User size={20} />
+
+              <div className="mobile-nav-content">
+                {/* Learning Group */}
+                <div className="nav-group">
+                  <h4 className="nav-group-title">Learning</h4>
+                  <div className="nav-group-items">
+                    {navigationItems.filter(item => ['home', 'progress', 'oneword', 'history'].includes(item.id)).map((item) => (
+                      <button
+                        key={item.id}
+                        className={`mobile-nav-item ${currentPage === item.id ? 'active' : ''}`}
+                        onClick={() => {
+                          setCurrentPage(item.id);
+                          setIsMobileNavOpen(false);
+                        }}
+                        style={{ '--item-color': item.color }}
+                      >
+                        <div className="nav-item-icon">
+                          <item.icon size={20} />
+                        </div>
+                        <span className="nav-item-label">{item.label}</span>
+                        {currentPage === item.id && <div className="active-indicator">●</div>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* System Group */}
+                <div className="nav-group">
+                  <h4 className="nav-group-title">System</h4>
+                  <div className="nav-group-items">
+                    {navigationItems.filter(item => ['about', 'faq', 'language', 'settings'].includes(item.id)).map((item) => (
+                      <button
+                        key={item.id}
+                        className={`mobile-nav-item ${currentPage === item.id ? 'active' : ''}`}
+                        onClick={() => {
+                          setCurrentPage(item.id);
+                          setIsMobileNavOpen(false);
+                        }}
+                        style={{ '--item-color': item.color }}
+                      >
+                        <div className="nav-item-icon">
+                          <item.icon size={20} />
+                        </div>
+                        <span className="nav-item-label">{item.label}</span>
+                        {currentPage === item.id && <div className="active-indicator">●</div>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mobile-nav-footer">
+                <button className="nav-auth-btn">
+                  <User size={18} />
                   <span>Login / Sign Up</span>
                 </button>
+                <p className="app-version">v2.3.0 • Beta</p>
               </div>
             </motion.div>
           </>
@@ -1675,11 +1690,7 @@ Shared from MiniMind AI`;
         {currentPage === 'home' ? (
           <div className="home-page">
             {/* World-Class Hero Header */}
-            <motion.div
-              className="header"
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
+            <div className="header">
               {/* Mobile header bar: menu, logo, theme, language */}
               <div className="header-bar">
                 <button
@@ -1693,46 +1704,34 @@ Shared from MiniMind AI`;
                   <span className="header-logo-text">MiniMind</span>
                 </div>
                 <div className="header-controls">
-                  {!showSuggestedPrompts && Object.keys(answers).length === 0 && !isAnswering && (
-                    <motion.button
-                      className="show-prompts-btn"
-                      onClick={() => setShowSuggestedPrompts(true)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Show Suggestions
-                    </motion.button>
-                  )}
-                  <motion.button
-                    className="theme-toggle-btn"
+                  <button
+                    className="theme-toggle-btn-mobile"
                     onClick={toggleTheme}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
                     title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
                   >
-                    {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-                  </motion.button>
-                  <motion.button
-                    className="language-btn"
+                    {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+                  </button>
+                  <button
+                    className="language-btn-mobile"
                     onClick={() => setIsLanguageModalOpen(true)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
                   >
-                    <Globe size={16} />
-                    {languages[selectedLanguage].flag}
-                    <span>{languages[selectedLanguage].name}</span>
-                  </motion.button>
+                    <span className="lang-code">{selectedLanguage.toUpperCase()}</span>
+                  </button>
                 </div>
               </div>
 
-              <div className="hero-container">
+              <motion.div
+                className="hero-container"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
                 <div className="hero-logo-container">
-                  <img src="https://i.ibb.co/fGLH5Dxs/minimind-logo.png" className="hero-logo" />
+                  <img src="https://i.ibb.co/fGLH5Dxs/minimind-logo.png" className="hero-logo" alt="MiniMind Logo" />
                   <h1 className="logo">MiniMind</h1>
                 </div>
                 <p className="tagline">AI-Powered Learning Revolution</p>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
 
             {/* World-Class Search Section */}
             <motion.div
@@ -1748,6 +1747,7 @@ Shared from MiniMind AI`;
                 <ModeFilter
                   enabledModes={enabledModes}
                   onToggleMode={toggleMode}
+                  isMobile={isMobile}
                 />
               </div>
 
@@ -1895,7 +1895,7 @@ Shared from MiniMind AI`;
                         <p>Refining your question...</p>
                       </div>
                     ) : (
-                      <p>{refinedPrompt}</p>
+                      <FormattedText text={refinedPrompt} />
                     )}
                     <div className="modal-actions">
                       <button
@@ -1919,6 +1919,22 @@ Shared from MiniMind AI`;
                 </motion.div>
               )}
             </AnimatePresence>
+
+
+            {/* Empty State */}
+            {!fullscreenMode && Object.keys(answers).length === 0 && !isAnswering && !showSuggestedPrompts && (
+              <motion.div
+                className="empty-state"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                <div className="empty-state-content">
+                  <Sparkles size={24} className="empty-icon" />
+                  <p>Select modes and ask a question to begin your journey of minimized wisdom.</p>
+                </div>
+              </motion.div>
+            )}
 
             {/* Enhanced Answer Capsules - 2x2 Grid on desktop, accordion on mobile */}
             <AnimatePresence>
@@ -1954,21 +1970,41 @@ Shared from MiniMind AI`;
                             <span className="mode-icon">{modeConfig.icon}</span>
                             <h3>{modeConfig.name}</h3>
                             <span className="mode-tag">{modeLabels[modeKey]}</span>
+                            <button
+                              className="fullscreen-btn-header"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFullscreenModeChange(modeKey, answers[modeKey], question);
+                              }}
+                              title="View fullscreen"
+                              style={{
+                                marginLeft: 'auto',
+                                background: 'transparent',
+                                border: 'none',
+                                color: 'inherit',
+                                padding: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2-2h3" />
+                              </svg>
+                            </button>
                           </div>
                           <div className="capsule-content" onClick={(e) => e.stopPropagation()}>
                             {loadingModes[modeKey] ? (
-                              <div className="typing-indicator">
+                              <div className={`typing-indicator ${modeKey}`}>
                                 <span></span>
                                 <span></span>
                                 <span></span>
                               </div>
                             ) : answers[modeKey] ? (
                               <>
-                                <div
+                                <FormattedText
+                                  text={answers[modeKey]}
                                   className="capsule-answer"
-                                  dangerouslySetInnerHTML={{
-                                    __html: formatAnswer(answers[modeKey])
-                                  }}
                                 />
                                 {answers[modeKey] && (
                                   <div className="capsule-controls">
@@ -2009,18 +2045,6 @@ Shared from MiniMind AI`;
                                       title="Translate this answer to another language"
                                     >
                                       <Languages size={16} />
-                                    </button>
-                                    <button
-                                      className="fullscreen-btn"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleFullscreenModeChange(modeKey, answers[modeKey], question);
-                                      }}
-                                      title="View fullscreen"
-                                    >
-                                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-                                      </svg>
                                     </button>
                                   </div>
                                 )}
@@ -2170,58 +2194,69 @@ Shared from MiniMind AI`;
             </AnimatePresence>
 
             {/* Fullscreen Mode */}
+            {/* Fullscreen Mode (Mobile Rebuild) */}
             <AnimatePresence>
               {fullscreenMode && (
                 <motion.div
-                  className={`fullscreen-mode ${fullscreenMode}`}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
+                  className={`fullscreen-mode-mobile ${fullscreenMode}`}
+                  initial={{ opacity: 0, y: '100%' }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: '100%' }}
+                  transition={{ type: "spring", damping: 25, stiffness: 300 }}
                 >
-                  <div className="fullscreen-header">
-                    <div className="mode-info">
-                      <span className="mode-icon">{modes[fullscreenMode].icon}</span>
-                      <h2>{modes[fullscreenMode].name} Mode</h2>
-                    </div>
-
-                    <ModeSwitcher
-                      currentMode={fullscreenMode}
-                      onModeChange={handleFullscreenModeChange}
-                      enabledModes={enabledModes}
-                      answers={answers}
-                      question={question}
-                    />
-
+                  {/* Part 1: Sticky Top Header */}
+                  <div className="fs-header">
                     <button
-                      className="back-btn"
+                      className="fs-back-btn"
                       onClick={() => setFullscreenMode(null)}
+                      aria-label="Close"
                     >
-                      <ArrowLeft size={20} />
+                      <ArrowLeft size={22} />
                     </button>
+                    <div className="fs-header-title">
+                      <span className="fs-mode-icon">{modes[fullscreenMode].icon}</span>
+                      <span className="fs-mode-name">{modes[fullscreenMode].name}</span>
+                    </div>
+                    <div className="fs-header-spacer"></div> {/* Balance layout */}
                   </div>
 
-                  <div className="chat-container">
-                    <div className="chat-messages fullscreen-scroll" ref={chatContainerRef}>
-                      {chatMessages[fullscreenMode]?.map((msg, idx) => (
-                        <div key={idx} className={`message ${msg.type}`}>
+                  {/* Part 2: Scrollable Content Area */}
+                  <div className="fs-scroll-area" ref={chatContainerRef}>
+                    {chatMessages[fullscreenMode]?.map((msg, idx) => (
+                      <div key={idx} className={`fs-message-wrapper ${msg.type}`}>
+                        <div className="fs-message-card">
                           {msg.type === 'ai' ? (
                             <>
-                              <div
-                                className="message-content"
-                                dangerouslySetInnerHTML={{
-                                  __html: formatAnswer(msg.content)
-                                }}
-                              />
-                              <div className="message-controls">
+                              <div className="fs-content-body">
+                                <FormattedText
+                                  text={msg.content}
+                                  className="fs-formatted-text"
+                                />
+                              </div>
+
+                              {/* Part 3: Action Row (Inside Card, Bottom) */}
+                              <div className="fs-actions-row">
                                 <button
-                                  className="expand-to-ekakshar-btn"
+                                  className="fs-action-btn"
+                                  onClick={() => handleSpeak(msg.content, fullscreenMode)}
+                                  title="Listen"
+                                >
+                                  <Volume2 size={18} />
+                                </button>
+                                <button
+                                  className="fs-action-btn"
+                                  onClick={() => fallbackToClipboard(msg.content, 'Answer')}
+                                  title="Copy"
+                                >
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="8" y="2" width="8" height="4" rx="1" ry="1" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /></svg>
+                                </button>
+                                <button
+                                  className="fs-action-btn"
                                   onClick={() => {
-                                    // Switch to Ekakshar mode
+                                    // Logic for One-Word expansion inline
                                     setFullscreenMode(null);
                                     setCurrentPage('oneword');
-                                    // Set the question for Ekakshar
                                     setOnewordInput(question);
-                                    // Get the Ekakshar answer
                                     setTimeout(() => {
                                       const getEkaksharAnswer = async () => {
                                         try {
@@ -2229,106 +2264,55 @@ Shared from MiniMind AI`;
                                           const response = await AIService.getOneWordAnswer(question, selectedLanguage);
                                           setOnewordAnswer(response);
                                           setIsOnewordLoading(false);
-                                        } catch (error) {
-                                          console.error('Ekakshar error:', error);
-                                          addNotification('Failed to get Ekakshar answer', 'error');
-                                          setIsOnewordLoading(false);
-                                        }
+                                        } catch (error) { setIsOnewordLoading(false); }
                                       };
                                       getEkaksharAnswer();
                                     }, 100);
                                   }}
+                                  title="One Word Summary"
                                 >
-                                  <Wand2 size={16} /> Get One-Word Summary
+                                  <Wand2 size={18} />
                                 </button>
                                 <button
-                                  className="copy-btn"
+                                  className="fs-action-btn"
                                   onClick={() => {
-                                    fallbackToClipboard(msg.content, 'Answer');
+                                    const shareData = { title: 'MiniMind Answer', text: msg.content.substring(0, 100), url: window.location.href };
+                                    if (navigator.share) navigator.share(shareData).catch(console.error);
+                                    else fallbackToClipboard(msg.content, 'Answer');
                                   }}
-                                  title="Copy answer to clipboard"
+                                  title="Share"
                                 >
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-                                  </svg>
-                                </button>
-                                <button
-                                  className="download-btn"
-                                  onClick={() => {
-                                    // Create a Blob with the content
-                                    const blob = new Blob([msg.content], { type: 'text/plain' });
-                                    const url = URL.createObjectURL(blob);
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = `minimind-answer-${Date.now()}.txt`;
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                    URL.revokeObjectURL(url);
-                                  }}
-                                  title="Download answer as text file"
-                                >
-                                  <Download size={16} />
-                                </button>
-                                <button
-                                  className="share-btn"
-                                  onClick={() => {
-                                    const shareData = {
-                                      title: 'MiniMind Answer',
-                                      text: msg.content.substring(0, 100) + '...',
-                                      url: window.location.href
-                                    };
-
-                                    if (navigator.share) {
-                                      navigator.share(shareData).catch((error) => {
-                                        console.error('Share failed:', error);
-                                        // Fallback to clipboard if share fails
-                                        fallbackToClipboard(msg.content, 'Answer');
-                                      });
-                                    } else {
-                                      // Fallback for browsers that don't support Web Share API
-                                      fallbackToClipboard(msg.content, 'Answer');
-                                    }
-                                  }}
-                                  title="Share answer"
-                                >
-                                  <Share2 size={16} />
+                                  <Share2 size={18} />
                                 </button>
                               </div>
                             </>
                           ) : (
-                            <p className="message-content">{msg.content}</p>
-                          )}
-                          {msg.type === 'ai' && (
-                            <SpeechControls
-                              onSpeak={handleSpeak}
-                              onPause={pauseSpeech}
-                              onResume={resumeSpeech}
-                              onStop={stopSpeech}
-                              isSpeaking={isSpeaking}
-                              isPaused={speechPaused}
-                              text={msg.content}
-                              mode={fullscreenMode}
-                            />
+                            <p className="fs-user-text">{msg.content}</p>
                           )}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
+                    <div className="fs-bottom-spacer" />
+                  </div>
 
+                  {/* Part 4: Fixed Bottom Input */}
+                  <div className="fs-input-bar">
                     <form
                       onSubmit={(e) => handleChatSubmit(e, fullscreenMode)}
-                      className="chat-input-form"
+                      className="fs-input-form"
                     >
-                      <input
-                        name="chatInput"
-                        type="text"
-                        placeholder={`Continue chatting in ${modes[fullscreenMode].name} mode...`}
-                        className="chat-input"
-                      />
-                      <button type="submit" className="send-btn">
-                        <Send size={18} />
-                      </button>
+                      <div className="fs-input-container">
+                        <input
+                          name="chatInput"
+                          type="text"
+                          placeholder="Continue chatting..."
+                          className="fs-input-field"
+                          autoComplete="off"
+                        />
+                        <button type="submit" className="fs-send-btn">
+                          <Send size={18} />
+                        </button>
+                      </div>
                     </form>
                   </div>
                 </motion.div>
@@ -2342,16 +2326,17 @@ Shared from MiniMind AI`;
               <button
                 className="back-btn"
                 onClick={() => setCurrentPage('home')}
+                aria-label="Go back"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={22} />
               </button>
               <h1>{navigationItems.find(item => item.id === currentPage)?.label}</h1>
             </div>
+
             <div className="page-content">
               {currentPage === 'progress' && (
                 <div className="progress-page">
                   <div className="page-header-content">
-                    <h2>Your Learning Progress</h2>
                     <p>Track your learning journey across different modes and topics.</p>
                   </div>
 
@@ -2367,7 +2352,7 @@ Shared from MiniMind AI`;
                     </div>
                     <div className="stat-card">
                       <div className="stat-value">{Math.round(history.length > 0 ? history.reduce((acc, entry) => acc + Object.keys(entry.answers).length, 0) / history.length : 0)}</div>
-                      <div className="stat-label">Avg. Modes per Question</div>
+                      <div className="stat-label">Avg. Modes</div>
                     </div>
                     <div className="stat-card">
                       <div className="stat-value">{new Set(history.map(entry => entry.question)).size}</div>
@@ -2481,160 +2466,145 @@ Shared from MiniMind AI`;
                 </div>
               )}
               {currentPage === 'oneword' && (
-                <div className="oneword-page">
-                  <div className="page-header-content">
-                    <h2>Ekakshar - One Word AI Assistant</h2>
-                    <p>Get quick, concise answers in just one word or bullet-point summaries. Perfect for vocabulary, definitions, and fast facts.</p>
+                <div className="ekakshar-page">
+                  <div className="ekakshar-header">
+                    <p>Instant One-Word Answers</p>
                   </div>
 
-                  <div className="oneword-interface">
-                    <form onSubmit={handleOnewordSubmit} className="oneword-input-section">
-                      <input
-                        type="text"
-                        value={onewordInput}
-                        onChange={(e) => setOnewordInput(e.target.value)}
-                        placeholder="Ask for a one-word or bullet summary..."
-                        className="oneword-input"
-                      />
-                      <button type="submit" className="oneword-btn" disabled={isOnewordLoading}>
+                  <div className="ekakshar-content">
+                    <form onSubmit={handleOnewordSubmit} className="ekakshar-form">
+                      <div className="ekakshar-input-wrapper">
+                        <input
+                          autoFocus
+                          type="text"
+                          value={onewordInput}
+                          onChange={(e) => setOnewordInput(e.target.value)}
+                          placeholder="Ask for a definition or fact..."
+                          className="ekakshar-input"
+                        />
+                        {onewordInput && (
+                          <button
+                            type="button"
+                            className="clear-input-btn"
+                            onClick={() => setOnewordInput('')}
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="ekakshar-submit-btn"
+                        disabled={isOnewordLoading || !onewordInput.trim()}
+                      >
                         {isOnewordLoading ? (
-                          <div className="mini-spinner" />
+                          <div className="mini-spinner-white" />
                         ) : (
-                          <>
-                            <Sparkles size={16} />
-                            One Word Answer
-                          </>
+                          "Get One-Word Answer"
                         )}
                       </button>
                     </form>
 
-                    {onewordAnswer && (
-                      <motion.div
-                        className="oneword-answer"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                      >
-                        <h3>Ekakshar Answer:</h3>
-                        {onewordAnswer.includes('\n') || onewordAnswer.includes('•') || onewordAnswer.includes('-') ? (
-                          <ul>
-                            {onewordAnswer.split('\n').map((item, index) => {
-                              // Remove bullet points or dashes if they exist
-                              const cleanItem = item.replace(/^[•\-]\s*/, '').trim();
-                              return cleanItem ? <li key={index}>{cleanItem}</li> : null;
-                            })}
-                          </ul>
-                        ) : (
-                          <p>{onewordAnswer}</p>
-                        )}
-                        <div className="oneword-controls">
-                          <button
-                            className="speak-btn"
-                            onClick={() => handleSpeak(onewordAnswer, 'oneword')}
-                          >
-                            <Volume2 size={16} />
-                          </button>
-                          <button
-                            className="expand-btn"
-                            onClick={() => {
-                              // Set the question as the main question and switch to beginner mode
-                              setQuestion(onewordInput);
-                              setCurrentPage('home');
-                              // We'll trigger the beginner mode answer after the page switches
-                              setTimeout(() => {
-                                const beginnerAnswer = async () => {
-                                  try {
-                                    setIsAnswering(true);
-                                    const answer = await getAIResponse(onewordInput, 'beginner');
-                                    setAnswers(prev => ({ ...prev, beginner: answer }));
-                                    setIsAnswering(false);
-                                  } catch (error) {
-                                    console.error('Error getting expanded answer:', error);
-                                    addNotification('Failed to get expanded answer', 'error');
-                                    setIsAnswering(false);
-                                  }
-                                };
-                                beginnerAnswer();
-                              }, 100);
-                            }}
-                          >
-                            <Wand2 size={16} /> Expand Answer
-                          </button>
-                          <button
-                            className="copy-btn"
-                            onClick={() => {
-                              fallbackToClipboard(onewordAnswer, 'Ekakshar Answer');
-                            }}
-                            title="Copy answer to clipboard"
-                          >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                              <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-                            </svg>
-                          </button>
-                          <button
-                            className="download-btn"
-                            onClick={() => {
-                              // Create a Blob with the content
-                              const blob = new Blob([onewordAnswer], { type: 'text/plain' });
-                              const url = URL.createObjectURL(blob);
-                              const a = document.createElement('a');
-                              a.href = url;
-                              a.download = `minimind-ekakshar-answer-${Date.now()}.txt`;
-                              document.body.appendChild(a);
-                              a.click();
-                              document.body.removeChild(a);
-                              URL.revokeObjectURL(url);
-                            }}
-                            title="Download answer as text file"
-                          >
-                            <Download size={16} />
-                          </button>
-                          <button
-                            className="share-btn"
-                            onClick={() => {
-                              const shareData = {
-                                title: 'MiniMind Ekakshar Answer',
-                                text: onewordAnswer.substring(0, 100) + '...',
-                                url: window.location.href
-                              };
+                    <AnimatePresence>
+                      {!onewordAnswer && !isOnewordLoading && (
+                        <motion.div
+                          className="ekakshar-suggestions"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                        >
+                          <p className="suggestions-label">Quick Examples:</p>
+                          <div className="suggestions-grid">
+                            {[
+                              "Capital of Japan?",
+                              "Define 'Serendipity'",
+                              "Opposite of 'Brave'",
+                              "Synonym for 'Happy'",
+                              "Who invented the telephone?",
+                              "G20 summary"
+                            ].map((text, i) => (
+                              <button
+                                key={i}
+                                onClick={() => setOnewordInput(text)}
+                                className="suggestion-chip"
+                              >
+                                {text}
+                              </button>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
 
-                              if (navigator.share) {
-                                navigator.share(shareData).catch((error) => {
-                                  console.error('Share failed:', error);
-                                  // Fallback to clipboard if share fails
-                                  fallbackToClipboard(onewordAnswer, 'Ekakshar Answer');
-                                });
-                              } else {
-                                // Fallback for browsers that don't support Web Share API
-                                fallbackToClipboard(onewordAnswer, 'Ekakshar Answer');
-                              }
-                            }}
-                            title="Share answer"
-                          >
-                            <Share2 size={16} />
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
+                      {onewordAnswer && (
+                        <motion.div
+                          className="ekakshar-result-card"
+                          initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                        >
+                          <div className="result-content">
+                            <FormattedText text={onewordAnswer} className="ekakshar-answer-text" />
+                          </div>
 
-                    <div className="oneword-examples">
-                      <h3>Try asking for one-word answers or bullet summaries:</h3>
-                      <div className="example-grid">
-                        <span onClick={() => setOnewordInput("Capital of Japan?")}>"Capital of Japan?"</span>
-                        <span onClick={() => setOnewordInput("AI meaning?")}>"AI meaning?"</span>
-                        <span onClick={() => setOnewordInput("Photosynthesis definition?")}>"Photosynthesis definition?"</span>
-                        <span onClick={() => setOnewordInput("Explain gravity in one word")}>"Explain gravity in one word"</span>
-                        <span onClick={() => setOnewordInput("Steps of photosynthesis as bullet points")}>"Steps of photosynthesis as bullet points"</span>
-                        <span onClick={() => setOnewordInput("Newton's laws summary")}>"Newton's laws summary"</span>
-                      </div>
-                    </div>
+                          <div className="ekakshar-actions">
+                            <button
+                              className="ekakshar-action-btn"
+                              onClick={() => handleSpeak(onewordAnswer, 'oneword')}
+                              title="Speak"
+                            >
+                              <Volume2 size={18} /> Speak
+                            </button>
+
+                            <button
+                              className="ekakshar-action-btn"
+                              onClick={() => fallbackToClipboard(onewordAnswer, 'Ekakshar Answer')}
+                              title="Copy"
+                            >
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="8" y="2" width="8" height="4" rx="1" ry="1" /><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /></svg> Copy
+                            </button>
+
+                            <button
+                              className="ekakshar-action-btn primary-action"
+                              onClick={() => {
+                                setQuestion(onewordInput);
+                                setCurrentPage('home');
+                                setTimeout(() => {
+                                  const beginnerAnswer = async () => {
+                                    try {
+                                      setIsAnswering(true);
+                                      const answer = await getAIResponse(onewordInput, 'beginner');
+                                      setAnswers(prev => ({ ...prev, beginner: answer }));
+                                      setIsAnswering(false);
+                                    } catch (error) { setIsAnswering(false); }
+                                  };
+                                  beginnerAnswer();
+                                }, 100);
+                              }}
+                            >
+                              <Wand2 size={18} /> Expand
+                            </button>
+
+                            <button
+                              className="ekakshar-action-btn"
+                              onClick={() => {
+                                const shareData = { title: 'Ekakshar Answer', text: onewordAnswer, url: window.location.href };
+                                if (navigator.share) navigator.share(shareData).catch(console.error);
+                                else fallbackToClipboard(onewordAnswer, 'Answer');
+                              }}
+                              title="Share"
+                            >
+                              <Share2 size={18} /> Share
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               )}
               {currentPage === 'history' && (
                 <div className="history-page">
                   <div className="page-header-content">
-                    <h2>Learning History</h2>
                     <p>Review your past questions and answers across all learning modes.</p>
                   </div>
 
@@ -2731,105 +2701,114 @@ Shared from MiniMind AI`;
                       {filteredHistory.map((entry) => (
                         <motion.div
                           key={entry.id}
-                          className="history-entry"
-                          whileHover={{ scale: 1.02 }}
+                          className={`history-entry ${expandedHistoryId === entry.id ? 'expanded' : ''}`}
+                          initial={false}
+                          animate={{ backgroundColor: expandedHistoryId === entry.id ? 'var(--bg-surface)' : 'transparent' }}
+                          transition={{ duration: 0.2 }}
                         >
-                          <div className="history-header">
-                            <div className="history-info">
-                              <span className="history-date">{entry.date}</span>
-                              <span className="history-time">{entry.time}</span>
-                              <span className="history-language">{languages[entry.language]?.name || 'English'}</span>
-                            </div>
-                            <div className="history-modes">
-                              {Object.entries(entry.answers).map(([mode, answer]) => (
-                                <span key={mode} className={`mode-badge ${mode}`}>
-                                  {modes[mode]?.icon}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="history-question">
-                            <strong>Q: </strong>{entry.question}
-                          </div>
-                          <div className="history-answers">
-                            {Object.entries(entry.answers).map(([mode, answer]) => (
-                              <div key={mode} className="history-answer">
-                                <div className="answer-header">
-                                  <strong>{modes[mode]?.name || mode}: </strong>
-                                  <div className="answer-controls">
-                                    <button
-                                      className="speak-btn-small"
-                                      onClick={() => handleSpeak(answer, mode)}
-                                      title="Listen to answer"
-                                    >
-                                      <Volume2 size={14} />
-                                    </button>
-                                    <button
-                                      className="copy-btn-small"
-                                      onClick={() => fallbackToClipboard(answer, `${modes[mode]?.name} Answer`)}
-                                      title="Copy to clipboard"
-                                    >
-                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-                                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-                                      </svg>
-                                    </button>
-                                    <button
-                                      className="share-btn-small"
-                                      onClick={() => {
-                                        const shareData = {
-                                          title: `MiniMind ${modes[mode]?.name} Answer`,
-                                          text: answer.substring(0, 100) + '...',
-                                          url: window.location.href
-                                        };
-
-                                        if (navigator.share) {
-                                          navigator.share(shareData).catch((error) => {
-                                            console.error('Share failed:', error);
-                                            fallbackToClipboard(answer, `${modes[mode]?.name} Answer`);
-                                          });
-                                        } else {
-                                          fallbackToClipboard(answer, `${modes[mode]?.name} Answer`);
-                                        }
-                                      }}
-                                      title="Share answer"
-                                    >
-                                      <Share2 size={14} />
-                                    </button>
-                                  </div>
-                                </div>
-                                <div
-                                  className="answer-content"
-                                  dangerouslySetInnerHTML={{
-                                    __html: formatAnswer(answer)
-                                  }}
-                                />
+                          {/* Collapsed Header / Toggle */}
+                          <div
+                            className="history-header-new"
+                            onClick={() => {
+                              if (expandedHistoryId === entry.id) {
+                                setExpandedHistoryId(null);
+                              } else {
+                                setExpandedHistoryId(entry.id);
+                                const availableModes = Object.keys(entry.answers);
+                                setExpandedHistoryMode(availableModes.includes('beginner') ? 'beginner' : availableModes[0]);
+                              }
+                            }}
+                          >
+                            <div className="history-main-info">
+                              <div className="history-meta-row">
+                                <span className="history-timestamp">{entry.date} <span className="dot">•</span> {entry.time}</span>
+                                {entry.pinned && <span className="pinned-badge">📌 Pinned</span>}
                               </div>
-                            ))}
+                              <h3 className="history-question-text">{entry.question}</h3>
+
+                              <div className="history-overview-badges">
+                                <span className="lang-badge-small">{languages[entry.language]?.flag} {languages[entry.language]?.name}</span>
+                                <div className="mode-icons-row">
+                                  {Object.keys(entry.answers).map(mode => (
+                                    <span key={mode} className={`mode-dot ${mode}`} title={modes[mode]?.name}>
+                                      {modes[mode]?.icon}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="expand-icon">
+                              {expandedHistoryId === entry.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                            </div>
                           </div>
-                          <div className="history-entry-actions">
-                            <button
-                              className="pin-btn"
-                              onClick={() => pinHistoryEntry(entry.id)}
-                            >
-                              {entry.pinned ? 'Unpin' : 'Pin'}
-                            </button>
-                            <button
-                              className="replay-btn"
-                              onClick={() => loadHistoryEntry(entry)}
-                            >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polygon points="5 3 19 12 5 21 5 3" />
-                              </svg>
-                              Replay
-                            </button>
-                            <button
-                              className="delete-btn"
-                              onClick={() => deleteHistoryEntry(entry.id)}
-                            >
-                              <X size={16} /> Delete
-                            </button>
-                          </div>
+
+                          {/* Expanded Content */}
+                          <AnimatePresence>
+                            {expandedHistoryId === entry.id && (
+                              <motion.div
+                                className="history-expanded-body"
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                {/* Mode Tabs */}
+                                <div className="history-mode-tabs">
+                                  {Object.keys(entry.answers).map(mode => (
+                                    <button
+                                      key={mode}
+                                      className={`history-tab ${expandedHistoryMode === mode ? 'active' : ''} ${mode}`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setExpandedHistoryMode(mode);
+                                      }}
+                                    >
+                                      {modes[mode]?.icon} {modes[mode]?.name}
+                                    </button>
+                                  ))}
+                                </div>
+
+                                {/* Active Answer */}
+                                {expandedHistoryMode && entry.answers[expandedHistoryMode] && (
+                                  <div className="history-answer-container">
+                                    <FormattedText
+                                      text={entry.answers[expandedHistoryMode]}
+                                      className="history-formatted-text"
+                                    />
+
+                                    <div className="answer-mini-controls">
+                                      <button onClick={() => handleSpeak(entry.answers[expandedHistoryMode], expandedHistoryMode)} title="Read Aloud">
+                                        <Volume2 size={16} />
+                                      </button>
+                                      <button onClick={() => fallbackToClipboard(entry.answers[expandedHistoryMode], `${modes[expandedHistoryMode]?.name} Answer`)} title="Copy">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" ry="1" /></svg>
+                                      </button>
+                                      <button onClick={() => {
+                                        const shareData = { title: 'MiniMind Answer', text: entry.answers[expandedHistoryMode].substring(0, 100) + '...', url: window.location.href };
+                                        if (navigator.share) navigator.share(shareData).catch(console.error);
+                                        else fallbackToClipboard(entry.answers[expandedHistoryMode], 'Answer');
+                                      }} title="Share">
+                                        <Share2 size={16} />
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Entry Actions */}
+                                <div className="history-footer-actions">
+                                  <button className="action-btn pin" onClick={() => pinHistoryEntry(entry.id)}>
+                                    {entry.pinned ? 'Unpin' : 'Pin Entry'}
+                                  </button>
+                                  <button className="action-btn replay" onClick={() => loadHistoryEntry(entry)}>
+                                    <Wand2 size={14} /> Replay
+                                  </button>
+                                  <button className="action-btn delete" onClick={() => deleteHistoryEntry(entry.id)}>
+                                    <X size={14} /> Delete
+                                  </button>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </motion.div>
                       ))}
                     </div>
@@ -2844,37 +2823,44 @@ Shared from MiniMind AI`;
               {currentPage === 'about' && (
                 <div className="about-page">
                   <div className="page-header-content">
-                    <h2>Meet the Minds Behind MINIMIND</h2>
                     <p>At MINIMIND, we believe in creating more than just a platform — we're building an experience.</p>
                   </div>
 
                   <div className="team-grid">
                     <div className="team-member">
                       <div className="member-icon">🧠</div>
-                      <h3>Yuvraj Singh Bundela</h3>
-                      <h4>Backend Developer</h4>
-                      <p>Yuvraj is the powerhouse behind our backend systems. From building robust APIs to implementing secure and scalable server logic, he ensures MINIMIND performs seamlessly under the hood, so users get speed, stability, and security.</p>
+                      <div className="member-info">
+                        <h3>Yuvraj Singh Bundela</h3>
+                        <h4>Backend Developer</h4>
+                        <p>Yuvraj is the powerhouse behind our backend systems. From building robust APIs to implementing secure and scalable server logic, he ensures MINIMIND performs seamlessly under the hood, so users get speed, stability, and security.</p>
+                      </div>
                     </div>
 
                     <div className="team-member">
                       <div className="member-icon">🛡️</div>
-                      <h3>Ushma Talreja</h3>
-                      <h4>Quality Assurance Specialist</h4>
-                      <p>Ushma ensures that MINIMIND runs like a well-oiled machine. With a sharp eye for detail, she rigorously tests every feature, hunts down bugs, and proactively recommends enhancements — all to deliver a flawless and enjoyable user experience.</p>
+                      <div className="member-info">
+                        <h3>Ushma Talreja</h3>
+                        <h4>Quality Assurance Specialist</h4>
+                        <p>Ushma ensures that MINIMIND runs like a well-oiled machine. With a sharp eye for detail, she rigorously tests every feature, hunts down bugs, and proactively recommends enhancements — all to deliver a flawless and enjoyable user experience.</p>
+                      </div>
                     </div>
 
                     <div className="team-member">
                       <div className="member-icon">🔧</div>
-                      <h3>Ishita Bajpai</h3>
-                      <h4>Product Development Associate</h4>
-                      <p>Ishita brings flexibility and curiosity to the table, contributing across various stages of product development. Her multidisciplinary approach helps drive innovation as she explores her niche within the team.</p>
+                      <div className="member-info">
+                        <h3>Ishita Bajpai</h3>
+                        <h4>Product Development Associate</h4>
+                        <p>Ishita brings flexibility and curiosity to the table, contributing across various stages of product development. Her multidisciplinary approach helps drive innovation as she explores her niche within the team.</p>
+                      </div>
                     </div>
 
                     <div className="team-member">
                       <div className="member-icon">🎨</div>
-                      <h3>Priyansh Gautam</h3>
-                      <h4>UI Designer</h4>
-                      <p>Priyansh is the creative force shaping MINIMIND's visual identity. With a keen sense of design, he crafts intuitive, modern, and user-centric interfaces that make learning not just effective — but enjoyable.</p>
+                      <div className="member-info">
+                        <h3>Priyansh Gautam</h3>
+                        <h4>UI Designer</h4>
+                        <p>Priyansh is the creative force shaping MINIMIND's visual identity. With a keen sense of design, he crafts intuitive, modern, and user-centric interfaces that make learning not just effective — but enjoyable.</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2883,74 +2869,89 @@ Shared from MiniMind AI`;
               {currentPage === 'faq' && (
                 <div className="faq-page">
                   <div className="page-header-content">
-                    <h2>Frequently Asked Questions</h2>
                     <p>Find answers to common questions about MINIMIND.</p>
                   </div>
 
                   <div className="faq-list">
-                    <div className="faq-item">
-                      <h3>Q: How can I track my learning progress on MINIMIND?</h3>
-                      <p>A: Our platform includes a dedicated Progress Tracker that shows your completed modules, time spent on each topic, and areas for improvement. You can set personal learning goals and monitor your achievements.</p>
-                    </div>
-
-                    <div className="faq-item">
-                      <h3>Q: Is there a cost associated with using MINIMIND?</h3>
-                      <p>A: MINIMIND offers a free tier with access to essential features. Premium content and advanced functionalities will be available through a subscription model, but we ensure that core learning remains accessible to all users.</p>
-                    </div>
-
-                    <div className="faq-item">
-                      <h3>Q: How does MINIMIND handle user feedback?</h3>
-                      <p>A: We value user input and have a dedicated team to review all feedback. Suggestions for new features or content are prioritized based on user demand and feasibility.</p>
-                    </div>
-
-                    <div className="faq-item">
-                      <h3>Q: Can I delete my account and data?</h3>
-                      <p>A: Yes, you can delete your account at any time through your profile settings. All associated data will be permanently removed from our servers.</p>
-                    </div>
-
-                    <div className="faq-item">
-                      <h3>Q: What if I encounter a technical issue while using MINIMIND?</h3>
-                      <p>A: Our support team is available 24/7 to assist you with any technical difficulties. You can reach out via the in-app support feature or our website's contact form.</p>
-                    </div>
-
-                    <div className="faq-item">
-                      <h3>Q: How do the learning modes differ from one another?</h3>
-                      <p>A: Each learning mode is tailored to specific age groups and expertise levels:<br />
-                        Beginner Mode: Simplified explanations and relatable examples<br />
-                        Teen Mode: Engaging content with real-world applications<br />
-                        College Mode: In-depth analysis and technical details<br />
-                        Mastery Mode: Advanced concepts and critical thinking challenges</p>
-                    </div>
-
-                    <div className="faq-item">
-                      <h3>Q: Are there interactive elements in the learning modules?</h3>
-                      <p>A: Yes! Our learning capsules include quizzes, interactive exercises, and discussion prompts to reinforce understanding and encourage active participation.</p>
-                    </div>
-
-                    <div className="faq-item">
-                      <h3>Q: How does MINIMIND support different learning styles?</h3>
-                      <p>A: We incorporate various formats, including text, audio, and visual aids, to cater to diverse learning preferences. Users can choose their preferred mode of engagement for each topic.</p>
-                    </div>
-
-                    <div className="faq-item">
-                      <h3>Q: What new features have been added to enhance the user experience?</h3>
-                      <p>A: We've recently added several enhancements including improved dark mode support, enhanced language selection dropdowns, better text visibility in input fields, and updated team information. We've also improved the progress tracking system and added more interactive elements to make learning more engaging.</p>
-                    </div>
-
-                    <div className="faq-item">
-                      <h3>Q: How does the OneWord feature work?</h3>
-                      <p>A: The OneWord feature provides quick, concise answers in just one word or bullet-point summaries. Perfect for vocabulary, definitions, and fast facts. Simply enter your question in the OneWord section and get instant concise answers.</p>
-                    </div>
-
-                    <div className="faq-item">
-                      <h3>Q: Can I use MINIMIND in different languages?</h3>
-                      <p>A: Yes, MINIMIND supports multiple languages including English, Hindi, Spanish, French, German, and many more. You can easily switch between languages in the language settings. We also offer Roman script options for Indian languages for easier typing.</p>
-                    </div>
-
-                    <div className="faq-item">
-                      <h3>Q: How is my data protected on MINIMIND?</h3>
-                      <p>A: We take data privacy seriously. All your learning data is securely stored and encrypted. You have full control over your data and can delete your account and all associated data at any time. We never sell or share your personal information with third parties.</p>
-                    </div>
+                    {[
+                      {
+                        q: "How can I track my learning progress on MINIMIND?",
+                        a: "Our platform includes a dedicated Progress Tracker that shows your completed modules, time spent on each topic, and areas for improvement. You can set personal learning goals and monitor your achievements."
+                      },
+                      {
+                        q: "Is there a cost associated with using MINIMIND?",
+                        a: "MINIMIND offers a free tier with access to essential features. Premium content and advanced functionalities will be available through a subscription model, but we ensure that core learning remains accessible to all users."
+                      },
+                      {
+                        q: "How does MINIMIND handle user feedback?",
+                        a: "We value user input and have a dedicated team to review all feedback. Suggestions for new features or content are prioritized based on user demand and feasibility."
+                      },
+                      {
+                        q: "Can I delete my account and data?",
+                        a: "Yes, you can delete your account at any time through your profile settings. All associated data will be permanently removed from our servers."
+                      },
+                      {
+                        q: "What if I encounter a technical issue while using MINIMIND?",
+                        a: "Our support team is available 24/7 to assist you with any technical difficulties. You can reach out via the in-app support feature or our website's contact form."
+                      },
+                      {
+                        q: "How do the learning modes differ from one another?",
+                        a: "Each learning mode is tailored to specific age groups and expertise levels:\nBeginner Mode: Simplified explanations and relatable examples\nTeen Mode: Engaging content with real-world applications\nCollege Mode: In-depth analysis and technical details\nMastery Mode: Advanced concepts and critical thinking challenges"
+                      },
+                      {
+                        q: "Are there interactive elements in the learning modules?",
+                        a: "Yes! Our learning capsules include quizzes, interactive exercises, and discussion prompts to reinforce understanding and encourage active participation."
+                      },
+                      {
+                        q: "How does MINIMIND support different learning styles?",
+                        a: "We incorporate various formats, including text, audio, and visual aids, to cater to diverse learning preferences. Users can choose their preferred mode of engagement for each topic."
+                      },
+                      {
+                        q: "What new features have been added to enhance the user experience?",
+                        a: "We've recently added several enhancements including improved dark mode support, enhanced language selection dropdowns, better text visibility in input fields, and updated team information. We've also improved the progress tracking system and added more interactive elements to make learning more engaging."
+                      },
+                      {
+                        q: "How does the OneWord feature work?",
+                        a: "The OneWord feature provides quick, concise answers in just one word or bullet-point summaries. Perfect for vocabulary, definitions, and fast facts. Simply enter your question in the OneWord section and get instant concise answers."
+                      },
+                      {
+                        q: "Can I use MINIMIND in different languages?",
+                        a: "Yes, MINIMIND supports multiple languages including English, Hindi, Spanish, French, German, and many more. You can easily switch between languages in the language settings. We also offer Roman script options for Indian languages for easier typing."
+                      },
+                      {
+                        q: "How is my data protected on MINIMIND?",
+                        a: "We take data privacy seriously. All your learning data is securely stored and encrypted. You have full control over your data and can delete your account and all associated data at any time. We never sell or share your personal information with third parties."
+                      }
+                    ].map((item, index) => (
+                      <motion.div
+                        key={index}
+                        className={`faq-item ${expandedFaqIndex === index ? 'active' : ''}`}
+                        initial={false}
+                        onClick={() => setExpandedFaqIndex(expandedFaqIndex === index ? null : index)}
+                      >
+                        <div className="faq-question">
+                          <h3>{item.q}</h3>
+                          <span className="faq-icon">
+                            {expandedFaqIndex === index ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </span>
+                        </div>
+                        <AnimatePresence>
+                          {expandedFaqIndex === index && (
+                            <motion.div
+                              className="faq-answer"
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3, ease: "easeInOut" }}
+                            >
+                              <div className="answer-content">
+                                <p style={{ whiteSpace: 'pre-line' }}>{item.a}</p>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -3033,7 +3034,6 @@ Shared from MiniMind AI`;
               {currentPage === 'language' && (
                 <div className="language-page">
                   <div className="page-header-content">
-                    <h2>Language & Script Settings</h2>
                     <p>Choose your preferred language and script style for AI responses.</p>
                   </div>
 
@@ -3102,7 +3102,6 @@ Shared from MiniMind AI`;
               {currentPage === 'settings' && (
                 <div className="settings-page">
                   <div className="page-header-content">
-                    <h2>Settings & Preferences</h2>
                     <p>Customize your MiniMind experience with these personalization options.</p>
                   </div>
 
@@ -3345,12 +3344,13 @@ Shared from MiniMind AI`;
                 </div>
               )}
             </div>
-          </div>
-        )}
-      </div>
+          </div >
+        )
+        }
+      </div >
 
       {/* Language Modal */}
-      <AnimatePresence>
+      < AnimatePresence >
         {isLanguageModalOpen && (
           <motion.div
             className="modal-overlay"
@@ -3413,10 +3413,10 @@ Shared from MiniMind AI`;
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence >
 
       {/* Translation Modal */}
-      <AnimatePresence>
+      < AnimatePresence >
         {isTranslationModalOpen && (
           <motion.div
             className="modal-overlay"
@@ -3485,13 +3485,17 @@ Shared from MiniMind AI`;
                 <div className="translation-text-container">
                   <div className="translation-text">
                     <h4>Original Text:</h4>
-                    <div className="text-content">{translationText}</div>
+                    <FormattedText text={translationText} className="text-content" />
                   </div>
 
                   <div className="translation-text">
                     <h4>Translated Text:</h4>
                     <div className="text-content translated">
-                      {translatedText || 'Translation will appear here...'}
+                      {translatedText ? (
+                        <FormattedText text={translatedText} />
+                      ) : (
+                        'Translation will appear here...'
+                      )}
                     </div>
                   </div>
                 </div>
@@ -3499,10 +3503,10 @@ Shared from MiniMind AI`;
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence >
 
       {/* Notifications */}
-      <div className="notifications">
+      < div className="notifications" >
         <AnimatePresence>
           {notifications.map((notification) => (
             <motion.div
@@ -3520,8 +3524,8 @@ Shared from MiniMind AI`;
             </motion.div>
           ))}
         </AnimatePresence>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
 

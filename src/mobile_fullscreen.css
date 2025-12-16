@@ -1,0 +1,239 @@
+/* ========================================= */
+/*  FULLSCREEN MODE MOBILE REBUILD (v2)      */
+/* ========================================= */
+
+.fullscreen-mode-mobile {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    background: var(--bg-surface);
+    z-index: 5000;
+    /* Highest priority */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: var(--font-body);
+}
+
+/* --- Part 1: Header --- */
+.fs-header {
+    height: 56px;
+    /* Compact */
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--nav-border);
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.fs-back-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 0;
+}
+
+.fs-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.fs-mode-icon {
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+
+.fs-header-spacer {
+    width: 36px;
+    /* Balance back button */
+}
+
+/* --- Part 2: Scroll Area --- */
+.fs-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    background: var(--bg-surface);
+}
+
+.fs-message-wrapper {
+    padding: 24px 16px 0 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* User Message */
+.fs-user-text {
+    background: var(--bg-glass);
+    padding: 12px 16px;
+    border-radius: 20px;
+    border-bottom-right-radius: 4px;
+    max-width: 85%;
+    align-self: flex-end;
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* AI Message Card - The Main Event */
+.fs-message-card {
+    width: 100%;
+    max-width: 800px;
+    /* Readable max width */
+    margin: 0 auto;
+}
+
+.fs-content-body {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+/* Typography resets for the content */
+.fs-formatted-text h1,
+.fs-formatted-text h2,
+.fs-formatted-text h3 {
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+    color: var(--text-heading);
+}
+
+.fs-formatted-text p {
+    margin-bottom: 1.25em;
+}
+
+.fs-formatted-text ul,
+.fs-formatted-text ol {
+    padding-left: 20px;
+    margin-bottom: 1.25em;
+}
+
+.fs-formatted-text pre {
+    background: #1a1a1a;
+    padding: 16px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 16px 0;
+    border: 1px solid var(--nav-border);
+}
+
+.fs-bottom-spacer {
+    height: 100px;
+    /* Space for input bar */
+    width: 100%;
+}
+
+/* --- Part 3: Action Row --- */
+.fs-actions-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    /* Centered actions */
+    gap: 20px;
+    /* Even spacing */
+    padding: 16px 0;
+    margin-top: 32px;
+    border-top: 1px solid var(--nav-border);
+}
+
+.fs-action-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-glass);
+    border: 1px solid var(--nav-border);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fs-action-btn:active {
+    transform: scale(0.95);
+    background: var(--nav-active);
+}
+
+/* --- Part 4: Input Bar --- */
+.fs-input-bar {
+    flex-shrink: 0;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--nav-border);
+    padding: 12px 16px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.fs-input-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-glass);
+    border: 1px solid var(--nav-border);
+    border-radius: 24px;
+    padding: 4px 6px 4px 16px;
+}
+
+.fs-input-field {
+    flex: 1;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    padding: 10px 0;
+    color: var(--text-primary);
+    min-height: 44px;
+    outline: none;
+}
+
+.fs-send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--brand-primary);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Mode Specific Theming override */
+.fullscreen-mode-mobile.beginner .fs-header-title {
+    color: #10b981;
+}
+
+.fullscreen-mode-mobile.thinker .fs-header-title {
+    color: #8b5cf6;
+}
+
+.fullscreen-mode-mobile.story .fs-header-title {
+    color: #f59e0b;
+}
+
+.fullscreen-mode-mobile.mastery .fs-header-title {
+    color: #3b82f6;
+}

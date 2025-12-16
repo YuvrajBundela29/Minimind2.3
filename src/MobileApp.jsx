@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Send, 
-  Menu, 
+import {
+  Send,
+  Menu,
   X,
   Sun,
   Moon,
@@ -16,19 +16,25 @@ import {
   History,
   Languages,
   Download,
-  Share2
+  Share2,
+  Home,
+  BarChart3,
+  GraduationCap,
+  LogOut,
+  ChevronRight,
+  Cog
 } from 'lucide-react';
 import './mobile.css';
 
-const MobileApp = ({ 
-  modes, 
-  currentMode, 
-  onModeChange, 
-  onSendMessage, 
-  question, 
-  setQuestion, 
-  answers, 
-  theme, 
+const MobileApp = ({
+  modes,
+  currentMode,
+  onModeChange,
+  onSendMessage,
+  question,
+  setQuestion,
+  answers,
+  theme,
   toggleTheme,
   selectedLanguage,
   setSelectedLanguage,
@@ -40,15 +46,37 @@ const MobileApp = ({
   onStop,
   onDownload,
   onShare,
-  onShowHistory,
-  onShowSettings,
-  onShowLanguages
+  // Navigation props
+  onNavigate,
+  currentPage
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [showModeCards, setShowModeCards] = useState(true);
   const contentRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Navigation Items Configuration
+  const navGroups = [
+    {
+      title: 'Learning',
+      items: [
+        { id: 'home', icon: Home, label: 'Learn', color: '#2563eb' },
+        { id: 'progress', icon: BarChart3, label: 'Progress', color: '#059669' },
+        { id: 'oneword', icon: Brain, label: 'Ekakshar', color: '#7c3aed' },
+        { id: 'history', icon: History, label: 'History', color: '#d97706' },
+      ]
+    },
+    {
+      title: 'System',
+      items: [
+        { id: 'about', icon: User, label: 'About Us', color: '#8b5cf6' },
+        { id: 'faq', icon: GraduationCap, label: 'FAQ', color: '#0891b2' },
+        { id: 'language', icon: Languages, label: 'Language', color: '#0891b2' },
+        { id: 'settings', icon: Cog, label: 'Settings', color: '#6b7280' },
+      ]
+    }
+  ];
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -80,6 +108,14 @@ const MobileApp = ({
     setIsMenuOpen(!isMenuOpen);
   };
 
+  // Handle navigation
+  const handleNavigation = (pageId) => {
+    if (onNavigate) {
+      onNavigate(pageId);
+    }
+    setIsMenuOpen(false);
+  };
+
   // Handle back button
   const handleBack = () => {
     if (!showModeCards) {
@@ -100,9 +136,9 @@ const MobileApp = ({
           transition={{ duration: 0.3 }}
         >
           <div className="mode-card-header">
-            <div 
-              className="mode-card-icon" 
-              style={{ 
+            <div
+              className="mode-card-icon"
+              style={{
                 background: mode.color || 'var(--bg-tertiary)',
                 color: mode.textColor || 'var(--text-primary)'
               }}
@@ -112,7 +148,7 @@ const MobileApp = ({
             <div style={{ flex: 1 }}>
               <h3 className="mode-card-title">{mode.name}</h3>
             </div>
-            <span 
+            <span
               className="mode-tag"
               style={{
                 background: mode.color ? `${mode.color}20` : 'var(--bg-tertiary)',
@@ -126,7 +162,7 @@ const MobileApp = ({
             {mode.description || 'Ask me anything in this mode'}
           </p>
           <div className="mode-card-actions">
-            <button 
+            <button
               className="mobile-btn secondary"
               onClick={(e) => {
                 e.stopPropagation();
@@ -135,7 +171,7 @@ const MobileApp = ({
             >
               <Volume2 size={16} />
             </button>
-            <button 
+            <button
               className="mobile-btn secondary"
               onClick={(e) => {
                 e.stopPropagation();
@@ -161,26 +197,26 @@ const MobileApp = ({
             <div className="message-content">{question}</div>
           </div>
         )}
-        
+
         {answers[currentMode] && (
           <div className="message ai">
             <div className="message-content">
               {answers[currentMode]}
             </div>
             <div className="message-actions">
-              <button 
+              <button
                 className="action-btn"
                 onClick={() => onSpeak(answers[currentMode], currentMode)}
               >
                 <Volume2 size={16} />
               </button>
-              <button 
+              <button
                 className="action-btn"
                 onClick={() => onDownload(answers[currentMode], currentMode)}
               >
                 <Download size={16} />
               </button>
-              <button 
+              <button
                 className="action-btn"
                 onClick={() => onShare(answers[currentMode], currentMode)}
               >
@@ -206,22 +242,22 @@ const MobileApp = ({
             <Menu size={24} />
           </button>
         )}
-        
+
         <h1 className="mobile-header-title">
           {showModeCards ? 'MiniMind' : modes[currentMode]?.name || 'Chat'}
         </h1>
-        
+
         <div className="mobile-header-actions">
-          <button 
-            className="mobile-header-btn" 
+          <button
+            className="mobile-header-btn"
             onClick={toggleTheme}
             aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
           >
             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </button>
-          
+
           {!showModeCards && (
-            <button 
+            <button
               className="mobile-header-btn"
               onClick={() => onSpeak(answers[currentMode] || '', currentMode)}
               disabled={!answers[currentMode]}
@@ -241,13 +277,13 @@ const MobileApp = ({
 
       {/* Input Area */}
       <div className="mobile-input-container">
-        <button 
+        <button
           className="mobile-input-btn secondary"
           onClick={() => onSpeak('', currentMode)}
         >
           <Mic size={20} />
         </button>
-        
+
         <input
           ref={inputRef}
           type="text"
@@ -259,8 +295,8 @@ const MobileApp = ({
           onBlur={() => setIsInputFocused(false)}
           onKeyPress={(e) => e.key === 'Enter' && handleSend()}
         />
-        
-        <button 
+
+        <button
           className="mobile-input-btn"
           onClick={handleSend}
           disabled={!question.trim()}
@@ -270,74 +306,75 @@ const MobileApp = ({
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Navigation Drawer */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div 
-            className="mobile-menu-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={toggleMenu}
-          >
-            <motion.div 
-              className="mobile-menu"
+          <>
+            <motion.div
+              className="mobile-nav-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={toggleMenu}
+            />
+
+            <motion.div
+              className="mobile-nav-drawer"
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
-              transition={{ type: 'tween' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="mobile-menu-header">
-                <h3>Menu</h3>
-                <button className="mobile-menu-close" onClick={toggleMenu}>
-                  <X size={24} />
+              <div className="mobile-nav-header">
+                <div className="nav-header-brand">
+                  <span className="brand-icon">🧠</span>
+                  <h3>MiniMind</h3>
+                </div>
+                <button className="mobile-nav-close" onClick={toggleMenu}>
+                  <X size={20} />
                 </button>
               </div>
-              
-              <nav className="mobile-nav">
-                <button 
-                  className="mobile-nav-item"
-                  onClick={() => {
-                    onShowHistory();
-                    toggleMenu();
-                  }}
-                >
-                  <History size={20} />
-                  <span>History</span>
+
+              <div className="mobile-nav-content">
+                {navGroups.map((group, index) => (
+                  <div key={index} className="nav-group">
+                    {group.title && <h4 className="nav-group-title">{group.title}</h4>}
+                    <div className="nav-group-items">
+                      {group.items.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = currentPage === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            className={`mobile-nav-item ${isActive ? 'active' : ''}`}
+                            onClick={() => handleNavigation(item.id)}
+                            style={{
+                              '--item-color': item.color
+                            }}
+                          >
+                            <span className="nav-item-icon">
+                              <Icon size={20} color={isActive ? 'white' : item.color} />
+                            </span>
+                            <span className="nav-item-label">{item.label}</span>
+                            {isActive && <ChevronRight size={16} className="active-indicator" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mobile-nav-footer">
+                <button className="nav-auth-btn">
+                  <LogOut size={18} />
+                  <span>Login / Sign Up</span>
                 </button>
-                
-                <button 
-                  className="mobile-nav-item"
-                  onClick={() => {
-                    onShowSettings();
-                    toggleMenu();
-                  }}
-                >
-                  <Settings size={20} />
-                  <span>Settings</span>
-                </button>
-                
-                <button 
-                  className="mobile-nav-item"
-                  onClick={() => {
-                    onShowLanguages();
-                    toggleMenu();
-                  }}
-                >
-                  <Languages size={20} />
-                  <span>Languages</span>
-                </button>
-                
-                <div className="mobile-nav-divider"></div>
-                
-                <div className="mobile-nav-footer">
-                  <p>MiniMind v2.3</p>
-                  <p>© {new Date().getFullYear()} MiniMind AI</p>
-                </div>
-              </nav>
+                <p className="app-version">Version 2.3.0</p>
+              </div>
             </motion.div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>
