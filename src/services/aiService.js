@@ -10,15 +10,15 @@ const modePrompts = {
   beginner: `You are a friendly, patient teacher explaining concepts to children ages 5-10. Use simple analogies, toys, cartoons, and everyday examples. Be cheerful, encouraging, and use emojis. Keep sentences short and fun. Always provide COMPLETE explanations. If you include formulas, wrap them in [brackets] like [E=mc²]. End with a warm, encouraging question like "Does that make sense, buddy?" or "Want to learn more about this?". IMPORTANT: Always finish your complete response.
 
 Additionally, where it helps readability, you may use these theme markers in the text: **bold** for key terms, *tilt* for gentle emphasis, __highlight__ for tags or labels, and ^^large^^ for short sub-headings.`,
-  
+
   thinker: `You are a cool, knowledgeable teacher explaining concepts to teenagers and college students. Use pop culture references, memes, and real-world applications. Be casual but structured. Explain why things matter and how they apply to real life. Use some humor and sarcasm when appropriate. Make it relatable and engaging. Always provide COMPLETE explanations. For formulas, use [formula] notation like [BDP = Bandwidth × RTT]. IMPORTANT: Always finish your complete response.
 
 Additionally, where it helps readability, you may use these theme markers in the text: **bold** for key terms, *tilt* for gentle emphasis, __highlight__ for tags or labels, and ^^large^^ for short sub-headings.`,
-  
+
   story: `You are a friendly storyteller who explains everything through simple, fun stories. Create a very short story like you're telling it to a friend. Use everyday objects, animals, or people as characters. Keep sentences short and words simple. Start with "Once upon a time" or "Imagine if..." and tell a tiny story that naturally explains the concept. Make it feel like a bedtime story - warm, simple, and easy to understand. No complex words or long explanations. Just a sweet, simple story that teaches the idea. Always provide COMPLETE stories with proper endings. IMPORTANT: Always finish your complete response.
 
 Additionally, where it helps readability, you may use these theme markers in the text: **bold** for key terms, *tilt* for gentle emphasis, __highlight__ for tags or labels, and ^^large^^ for short sub-headings.`,
-  
+
   mastery: `You are an academic expert providing comprehensive, research-level explanations. Start with an abstract overview, then break down into theory, models, and formulas. Reference real-world applications in major companies and research. Use technical terminology appropriately. For mathematical formulas, use proper notation within [brackets] like [TCP_Throughput = (MSS/RTT) × sqrt(3/2) / sqrt(p)]. End with thought-provoking Socratic questions. Be thorough and rigorous. Always provide COMPLETE comprehensive explanations. IMPORTANT: Always finish your complete response with full details.
 
 Additionally, where it helps readability, you may use these theme markers in the text: **bold** for key terms, *tilt* for gentle emphasis, __highlight__ for tags or labels, and ^^large^^ for short sub-headings.`
@@ -71,7 +71,7 @@ const languageInstructions = {
   ms: 'Please respond in Malay language.',
   // Rajasthani language
   raj: 'Please respond in Rajasthani language.',
-  
+
   // Casual mode language codes (Roman script)
   hi_casual: 'Please respond in Hindi language but write using English alphabets/Roman script. For example: "Main accha hoon" instead of "मैं अच्छा हूं". This is for users who understand Hindi but prefer Roman script.',
   ur_casual: 'Please respond in Urdu language but write using English alphabets/Roman script. For example: "Main theek hoon" instead of "میں ٹھیک ہوں". This is for users who understand Urdu but prefer Roman script.',
@@ -104,19 +104,26 @@ class AIService {
   constructor() {
     this.apiKey = API_KEY;
     this.apiUrl = API_URL;
-    
+
     // Check if API key is properly configured
-    if (!this.apiKey || this.apiKey === 'your-api-key-here') {
-      console.warn('⚠️ OpenRouter API key not configured. Please set VITE_OPENROUTER_API_KEY in your .env.local file.');
+    // Log status to help debugging (restricted to non-production or when explicitly debugging)
+    const isConfigured = this.apiKey && this.apiKey !== 'your-api-key-here';
+
+    if (isConfigured) {
+      console.log('✅ OpenRouter API key configured');
+    } else {
+      console.warn('⚠️ OpenRouter API key not configured or using default placeholder.');
+      console.warn('👉 If you just added it to .env.local, YOU MUST RESTART YOUR SERVER for it to load.');
+      console.warn('👉 If on Netlify, you must Trigger a Deploy to bake in the new variables.');
     }
   }
 
   async makeRequest(messages, temperature = 0.7) {
     // Check API key before making request
     if (!this.apiKey || this.apiKey === 'your-api-key-here') {
-      throw new Error('OpenRouter API key not configured. Please set VITE_OPENROUTER_API_KEY in your .env.local file.');
+      throw new Error('OpenRouter API key not configured. If you set it recently, please RESTART your server (local) or REDEPLOY (Netlify).');
     }
-    
+
     try {
       const response = await fetch(this.apiUrl, {
         method: 'POST',
@@ -151,11 +158,11 @@ class AIService {
       }
 
       const data = await response.json();
-      
+
       if (!data.choices || !data.choices[0] || !data.choices[0].message) {
         throw new Error('Invalid response format from API');
       }
-      
+
       return data.choices[0].message.content;
     } catch (error) {
       console.error('AI Service Error:', error);
@@ -169,7 +176,7 @@ class AIService {
   async getExplanation(question, mode, language = 'en') {
     const systemPrompt = modePrompts[mode];
     const languageInstruction = languageInstructions[language] || '';
-    
+
     const messages = [
       {
         role: 'system',
@@ -186,7 +193,7 @@ class AIService {
 
   async refinePrompt(originalQuestion, language = 'en') {
     const languageInstruction = languageInstructions[language] || '';
-    
+
     const messages = [
       {
         role: 'system',
@@ -207,7 +214,7 @@ ${languageInstruction}`
 
   async getOneWordAnswer(question, language = 'en') {
     const languageInstruction = languageInstructions[language] || '';
-    
+
     const messages = [
       {
         role: 'system',
@@ -233,7 +240,7 @@ ${languageInstruction}`
   async continueConversation(messages, mode, language = 'en') {
     const systemPrompt = modePrompts[mode];
     const languageInstruction = languageInstructions[language] || '';
-    
+
     const formattedMessages = [
       {
         role: 'system',
@@ -255,19 +262,19 @@ ${languageInstruction}`
       if (sourceLanguage === targetLanguage) {
         return text;
       }
-      
+
       // Special handling for languages that need transliteration
       const transliterationLanguages = ['hi', 'bn', 'ta', 'te', 'ml', 'kn', 'gu', 'pa', 'or', 'as', 'mr', 'ne', 'sa', 'ur', 'sd', 'ks', 'doi', 'mni', 'sat', 'mai', 'kok', 'bho', 'bod', 'raj'];
-      
+
       // Use AI-based translation for all languages including Indian languages
       try {
         console.log(`Translating from ${sourceLanguage} to ${targetLanguage}`);
-        
+
         // Create translation prompt
         const translationPrompt = `Translate the following text from ${sourceLanguage} to ${targetLanguage}. Return only the translated text without any explanations or additional content:
 
 ${text}`;
-        
+
         // Use the same AI service for translation
         const messages = [
           {
@@ -279,13 +286,13 @@ ${text}`;
             content: translationPrompt
           }
         ];
-        
+
         const translatedText = await this.makeRequest(messages, 0.3);
         console.log('AI Translation result:', translatedText);
         return translatedText;
       } catch (apiError) {
         console.warn('AI translation failed, trying fallback translation API:', apiError);
-        
+
         // Fallback to MyMemory API
         try {
           const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLanguage}|${targetLanguage}`);
@@ -304,7 +311,7 @@ ${text}`;
           console.warn('Fallback translation API error:', fallbackError);
         }
       }
-      
+
       // If all else fails, return original text
       return text;
     } catch (error) {
